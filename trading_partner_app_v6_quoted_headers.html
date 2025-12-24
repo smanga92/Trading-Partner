@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0A0E27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Your Pre-Trade Accountability Partner">
+    
+    <title>Trading Partner</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRyYWRpbmcgUGFydG5lciIsCiAgInNob3J0X25hbWUiOiAiVHJhZGluZyIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBBMEUyNyIsCiAgInRoZW1lX2NvbG9yIjogIiMwQTBFMjciLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnMlM0QlMjdodHRwJTNBJTJGJTJGd3d3LnczLm9yZyUyRjIwMDAlMkZzdmclMjclMjB3aWR0aCUzRCUyNzE5MiUyNyUyMGhlaWdodCUzRCUyNzE5MiUyNyUzRSUzQ3JlY3QlMjB3aWR0aCUzRCUyNzE5MiUyNyUyMGhlaWdodCUzRCUyNzE5MiUyNyUyMGZpbGwlM0QlMjclMjMwQTBFMjclMjclMkYlM0UlM0N0ZXh0JTIweD0lMjc1MCUyNSUyNyUyMHklM0QlMjc1MCUyNSUyNyUyMGZvbnQtc2l6ZSUzRCUyNzgwJTI3JTIwZmlsbCUzRCUyNyUyMzAwRDlGRiUyNyUyMGRvbWluYW50LWJhc2VsaW5lJTNEJTI3bWlkZGxlJTI3JTIwdGV4dC1hbmNob3IlM0QlMjdtaWRkbGUlMjclM0UlRjAlOUYlOTIlQjklM0MlMkZ0ZXh0JTNFJTNDJTJGc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0A0E27;
+            --bg-secondary: #111628;
+            --bg-tertiary: #1A1F3A;
+            --accent-cyan: #00D9FF;
+            --accent-purple: #7B61FF;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8C5D6;
+            --border: #2D3548;
+            --success: #00FF94;
+            --danger: #FF4757;
+            --warning: #FFB800;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(123, 97, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 217, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 183, 0, 0.03) 0%, transparent 50%);
+            animation: pulse 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Container */
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            padding: 20px;
+            border-bottom: 2px solid var(--accent-cyan);
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Chat Container - WhatsApp Style */
+        .chat-container {
+            flex: 1;
+            padding: 20px 10px 20px 10px; /* Normal padding only! */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        /* Invisible scroll anchor at the very bottom */
+        .scroll-anchor {
+            height: 1px;
+            width: 1px;
+            visibility: hidden;
+        }
+
+        /* Message Bubbles - Full Width WhatsApp Style */
+        .message {
+            display: flex;
+            width: 100%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-bot {
+            justify-content: flex-start;
+        }
+
+        .message-user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 85%;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message-bot .message-bubble {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-user .message-bubble {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+            color: var(--text-primary);
+            border-bottom-right-radius: 2px;
+        }
+
+        .message-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            padding: 0 4px;
+            margin-bottom: 2px;
+        }
+
+        /* Buttons - Wrap nicely */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            flex: 0 1 auto;
+            white-space: nowrap;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .btn:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+            flex: 1 1 auto;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .btn-verdict {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-verdict:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-secondary);
+            transform: scale(1.05);
+        }
+
+        .btn-verdict.buy {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .btn-verdict.sell {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-verdict.standby {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        /* Input Field */
+        .input-container {
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            position: sticky;
+            bottom: 0;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        textarea.input-field {
+            resize: vertical;
+            min-height: 48px;
+            max-height: 150px;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Snapshot Image */
+        .snapshot-container {
+            margin-top: 12px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 8px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .snapshot-image {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .snapshot-image:hover {
+            transform: scale(1.02);
+        }
+
+        .snapshot-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            gap: 6px;
+            padding: 12px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            } 40% { 
+                transform: scale(1);
+            }
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+            padding: 60px 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .welcome-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Answer Group Selection */
+        .answer-group-item {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-group-item:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(4px);
+        }
+
+        .answer-group-item.selected {
+            border-color: var(--accent-cyan);
+            background: var(--bg-tertiary);
+        }
+
+        .answer-group-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        .answer-preview-tag {
+            background: var(--bg-primary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 22px;
+            }
+
+            .message-bubble {
+                font-size: 13px;
+            }
+
+            .btn {
+                padding: 9px 14px;
+                font-size: 12px;
+            }
+        }
+
+        /* Scrollbar */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* Scroll to Bottom Button - WhatsApp Style */
+        .scroll-to-bottom {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        .scroll-to-bottom.show {
+            display: flex;
+        }
+
+        .scroll-to-bottom:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 217, 255, 0.6);
+        }
+
+        .scroll-to-bottom:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(20px);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scroll-to-bottom {
+                right: 20px;
+                bottom: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="header-content">
+                <div class="app-title">Trading Partner</div>
+                <div class="status-indicator"></div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <!-- Messages will be inserted here -->
+            <!-- Invisible anchor element - defines true bottom -->
+            <div class="scroll-anchor" id="scrollAnchor"></div>
+        </div>
+
+        <!-- Scroll to Bottom Button -->
+        <button class="scroll-to-bottom" id="scrollToBottomBtn">
+            ⬇
+        </button>
+
+        <!-- Input Container -->
+        <div class="input-container" id="inputContainer" style="display: none;">
+            <div class="input-wrapper">
+                <textarea 
+                    class="input-field" 
+                    id="messageInput" 
+                    placeholder="Type your answer..."
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="sendBtn">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // PREDEFINED ANSWER GROUPS
+        // ============================================
+        const ANSWER_GROUPS = {
+            bias: {
+                name: 'Market Bias',
+                answers: [
+                    { text: '📈 Bullish', class: 'buy' },
+                    { text: '📉 Bearish', class: 'sell' },
+                    { text: '↔️ Sideways', class: 'standby' }
+                ]
+            },
+            flow: {
+                name: 'Order Flow',
+                answers: [
+                    { text: '⬆️ Up', class: 'buy' },
+                    { text: '⬇️ Down', class: 'sell' },
+                    { text: '➡️ Mixed', class: 'standby' },
+                    { text: '🔥 Strong Up', class: 'buy' },
+                    { text: '❄️ Weak Down', class: 'sell' }
+                ]
+            },
+            structure: {
+                name: 'Market Structure',
+                answers: [
+                    { text: '📊 HL/HH', class: 'buy' },
+                    { text: '📉 LH/LL', class: 'sell' },
+                    { text: '🔄 Choppy', class: 'standby' },
+                    { text: '💥 Break', class: '' },
+                    { text: '🎯 Retest', class: '' },
+                    { text: '📍 Support', class: '' },
+                    { text: '🚧 Resistance', class: '' }
+                ]
+            },
+            verdict: {
+                name: 'Trading Decision',
+                answers: [
+                    { text: '▲ Buy', class: 'buy' },
+                    { text: '▼ Sell', class: 'sell' },
+                    { text: '■ Stand by', class: 'standby' }
+                ]
+            },
+            strength: {
+                name: 'Trend Strength',
+                answers: [
+                    { text: '💪 Very Strong', class: 'buy' },
+                    { text: '👍 Strong', class: 'buy' },
+                    { text: '🤷 Moderate', class: 'standby' },
+                    { text: '👎 Weak', class: 'sell' },
+                    { text: '💀 Very Weak', class: 'sell' }
+                ]
+            },
+            timeframe: {
+                name: 'Timeframe Alignment',
+                answers: [
+                    { text: '✅ Aligned', class: 'buy' },
+                    { text: '⚠️ Partial', class: 'standby' },
+                    { text: '❌ Conflict', class: 'sell' }
+                ]
+            },
+            liquidity: {
+                name: 'Liquidity',
+                answers: [
+                    { text: '💧 Equal Highs', class: '' },
+                    { text: '🌊 Equal Lows', class: '' },
+                    { text: '🎯 Sweep', class: '' },
+                    { text: '📊 Pool Above', class: '' },
+                    { text: '📉 Pool Below', class: '' }
+                ]
+            },
+            volume: {
+                name: 'Volume Profile',
+                answers: [
+                    { text: '📈 High Volume', class: 'buy' },
+                    { text: '📉 Low Volume', class: 'sell' },
+                    { text: '📊 Average', class: 'standby' },
+                    { text: '🔥 Climax', class: '' }
+                ]
+            }
+        };
+
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const state = {
+            phase: 'welcome',
+            pairs: [],
+            questions: [],
+            questionGroups: {}, // Maps question index to answer group key
+            currentPairIndex: 0,
+            currentQuestionIndex: 0,
+            answers: {},
+            timestamp: '',
+            setupStep: 'pairs' // 'pairs', 'question-count', 'questions', 'groups'
+        };
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('tradingPartnerState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.pairs = parsed.pairs || [];
+                state.questions = parsed.questions || [];
+                state.questionGroups = parsed.questionGroups || {};
+                
+                if (state.pairs.length && state.questions.length) {
+                    state.phase = 'welcome-back';
+                }
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('tradingPartnerState', JSON.stringify({
+                pairs: state.pairs,
+                questions: state.questions,
+                questionGroups: state.questionGroups
+            }));
+        }
+
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+        const chatContainer = document.getElementById('chatContainer');
+        const inputContainer = document.getElementById('inputContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, isBot = true, buttons = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isBot ? 'message message-bot' : 'message message-user';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const label = document.createElement('div');
+            label.className = 'message-label';
+            label.textContent = isBot ? 'Trading Partner' : 'You';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+            
+            contentDiv.appendChild(label);
+            contentDiv.appendChild(bubble);
+            
+            if (buttons) {
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'button-group';
+                buttons.forEach(btn => {
+                    const button = document.createElement('button');
+                    button.className = `btn ${btn.class || 'btn-primary'}`;
+                    button.textContent = btn.text;
+                    button.onclick = btn.action;
+                    btnGroup.appendChild(button);
+                });
+                contentDiv.appendChild(btnGroup);
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            
+            // Insert BEFORE the anchor (not append to container)
+            const anchor = document.getElementById('scrollAnchor');
+            chatContainer.insertBefore(messageDiv, anchor);
+            
+            // Scroll to the anchor (real element, honest geometry)
+            scrollToAnchor();
+        }
+
+        function showLoading() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message message-bot';
+            loadingDiv.id = 'loading';
+            loadingDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-label">Trading Partner</div>
+                    <div class="message-bubble">
+                        <div class="loading">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            const anchor = document.getElementById('scrollAnchor');
+            chatContainer.insertBefore(loadingDiv, anchor);
+            scrollToAnchor();
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            if (loading) loading.remove();
+        }
+
+        function showInput(placeholder = 'Type your answer...') {
+            inputContainer.style.display = 'block';
+            messageInput.placeholder = placeholder;
+            messageInput.focus();
+        }
+
+        function hideInput() {
+            inputContainer.style.display = 'none';
+            messageInput.value = '';
+        }
+
+        function scrollToAnchor() {
+            // Scroll to the actual anchor element - no calculations needed!
+            const anchor = document.getElementById('scrollAnchor');
+            
+            // Only scroll if user is at/near bottom
+            if (isUserAtBottom()) {
+                anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } else {
+                showScrollButton();
+            }
+        }
+
+        function forceScrollToAnchor() {
+            // Force scroll to anchor regardless of position
+            const anchor = document.getElementById('scrollAnchor');
+            anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            hideScrollButton();
+        }
+
+        function isUserAtBottom() {
+            // Check if user is within 150px of bottom
+            const threshold = 150;
+            const position = chatContainer.scrollTop + chatContainer.clientHeight;
+            const bottom = chatContainer.scrollHeight;
+            return (bottom - position) < threshold;
+        }
+
+        // Old functions removed - we don't need them anymore!
+        // No more scrollTop calculations
+        // No more scrollHeight guessing
+        // Just scroll to the anchor element!
+
+        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+        
+        function showScrollButton() {
+            scrollToBottomBtn.classList.add('show');
+        }
+
+        function hideScrollButton() {
+            scrollToBottomBtn.classList.remove('show');
+        }
+
+        // Click handler for scroll button
+        scrollToBottomBtn.addEventListener('click', () => {
+            const anchor = document.getElementById('scrollAnchor');
+            anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            hideScrollButton();
+        });
+
+        // Monitor scroll position to show/hide button
+        chatContainer.addEventListener('scroll', () => {
+            if (isUserAtBottom()) {
+                hideScrollButton();
+            }
+        });
+
+        function clearChat() {
+            chatContainer.innerHTML = '';
+            // Re-add anchor
+            const anchor = document.createElement('div');
+            anchor.className = 'scroll-anchor';
+            anchor.id = 'scrollAnchor';
+            chatContainer.appendChild(anchor);
+        }
+
+        // ============================================
+        // SETUP FLOW
+        // ============================================
+        
+        function showWelcome() {
+            clearChat();
+            
+            if (state.phase === 'welcome-back') {
+                addMessage(
+                    `Welcome back! 💙\n\nYour pairs: ${state.pairs.join(', ')}\n\nReady to start your session?`,
+                    true,
+                    [
+                        { text: '▶ Start Session', class: 'btn-primary', action: startSession },
+                        { text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup }
+                    ]
+                );
+            } else {
+                const welcomeHTML = `
+                    <div class="welcome-screen">
+                        <div class="welcome-icon">💹</div>
+                        <div class="welcome-title">Trading Partner</div>
+                        <div class="welcome-subtitle">
+                            Your pre-trade accountability system.<br>
+                            Enforce discipline. Prevent impulsive trades.<br>
+                            Trade your plan, not your emotions.
+                        </div>
+                    </div>
+                `;
+                chatContainer.innerHTML = welcomeHTML;
+                // Re-add anchor after clearing
+                const anchor = document.createElement('div');
+                anchor.className = 'scroll-anchor';
+                anchor.id = 'scrollAnchor';
+                chatContainer.appendChild(anchor);
+                
+                forceScrollToAnchor();
+                
+                setTimeout(() => {
+                    addMessage(
+                        "Welcome! I'm your trading accountability partner. 🎯\n\nLet's set up your custom trading framework. This only takes 2 minutes.",
+                        true,
+                        [{ text: '🚀 Get Started', class: 'btn-primary', action: startSetup }]
+                    );
+                }, 800);
+            }
+        }
+
+        function startSetup() {
+            // Reset all configuration
+            state.pairs = [];
+            state.questions = [];
+            state.questionGroups = {};
+            state.currentQuestionSetup = 0;
+            state.questionCount = 0;
+            
+            state.setupStep = 'pairs';
+            state.phase = 'setup';
+            addMessage("Step 1 of 3: Trading Pairs\n\nEnter your pairs separated by commas.\n\nExample: EURUSD, GBPUSD, XAUUSD, USDJPY", true);
+            showInput('Enter pairs (e.g., EURUSD, GBPUSD)');
+        }
+
+        function handleSetupInput(input) {
+            if (state.setupStep === 'pairs') {
+                const pairs = input.split(',').map(p => p.trim().toUpperCase()).filter(p => p.length > 0);
+                
+                if (pairs.length === 0) {
+                    addMessage("❌ Please enter at least one trading pair.", true);
+                    return;
+                }
+                
+                state.pairs = pairs;
+                state.setupStep = 'question-count';
+                
+                addMessage(`✅ Pairs configured: ${pairs.join(', ')}`, true);
+                setTimeout(() => {
+                    addMessage(
+                        "Step 2 of 3: Questions\n\nHow many questions do you want to answer for each pair?\n\nRecommended: 3-5 questions",
+                        true
+                    );
+                    showInput('Enter number (e.g., 4)');
+                }, 500);
+                
+            } else if (state.setupStep === 'question-count') {
+                const count = parseInt(input);
+                
+                if (isNaN(count) || count < 1 || count > 10) {
+                    addMessage("❌ Please enter a number between 1 and 10.", true);
+                    return;
+                }
+                
+                state.questionCount = count;
+                state.setupStep = 'questions';
+                state.currentQuestionSetup = 0;
+                
+                addMessage(`✅ You'll answer ${count} questions per pair.`, true);
+                setTimeout(() => {
+                    askForQuestion();
+                }, 500);
+                
+            } else if (state.setupStep === 'questions') {
+                const questionText = input.trim();
+                
+                if (!questionText) {
+                    addMessage("❌ Please enter a question.", true);
+                    return;
+                }
+                
+                state.questions.push(questionText);
+                state.currentQuestionSetup++;
+                
+                if (state.currentQuestionSetup < state.questionCount) {
+                    addMessage(`✅ Question ${state.currentQuestionSetup} saved!`, true);
+                    setTimeout(() => {
+                        askForQuestion();
+                    }, 500);
+                } else {
+                    // All questions entered, now select answer groups
+                    state.setupStep = 'groups';
+                    state.currentQuestionSetup = 0;
+                    addMessage(`✅ All questions saved!`, true);
+                    setTimeout(() => {
+                        askForAnswerGroup();
+                    }, 500);
+                }
+            }
+        }
+
+        function askForQuestion() {
+            const num = state.currentQuestionSetup + 1;
+            addMessage(
+                `Question ${num} of ${state.questionCount}\n\nWhat question do you want to ask?\n\nExample: "Daily Bias" or "Order Flow" or "M15 Structure"`,
+                true
+            );
+            showInput(`Enter question ${num}...`);
+        }
+
+        function askForAnswerGroup() {
+            if (state.currentQuestionSetup >= state.questions.length) {
+                // Setup complete
+                finishSetup();
+                return;
+            }
+            
+            const questionText = state.questions[state.currentQuestionSetup];
+            const num = state.currentQuestionSetup + 1;
+            
+            hideInput();
+            
+            addMessage(
+                `Question ${num}: "${questionText}"\n\nWhich answer group should I use for this question?`,
+                true
+            );
+            
+            // Show answer group options as buttons
+            const buttons = Object.keys(ANSWER_GROUPS).map(key => {
+                const group = ANSWER_GROUPS[key];
+                if (!group || !group.answers) {
+                    console.error('Invalid group:', key, group);
+                    return null;
+                }
+                return {
+                    text: `📋 ${group.name}`,
+                    class: 'btn-verdict',
+                    action: () => showAnswerGroupPreview(key)
+                };
+            }).filter(b => b !== null);
+            
+            addMessage(
+                `Choose one to see its options:`,
+                true,
+                buttons
+            );
+        }
+        
+        function showAnswerGroupPreview(groupKey) {
+            const group = ANSWER_GROUPS[groupKey];
+            if (!group || !group.answers) return;
+            
+            // Hide the selection buttons
+            const messages = chatContainer.querySelectorAll('.message');
+            if (messages.length >= 1) {
+                const prevMessage = messages[messages.length - 1];
+                const buttonGroup = prevMessage.querySelector('.button-group');
+                if (buttonGroup) {
+                    buttonGroup.style.display = 'none';
+                }
+            }
+            
+            // Show preview of this group's answers
+            const preview = group.answers.map(a => a.text).join(' • ');
+            addMessage(
+                `📋 ${group.name}\n\n${preview}\n\nUse this group?`,
+                true,
+                [
+                    { text: '✅ Yes, use this', class: 'btn-primary', action: () => confirmAnswerGroup(groupKey) },
+                    { text: '← Choose different', class: 'btn-verdict', action: () => {
+                        // Hide current buttons and go back
+                        const msgs = chatContainer.querySelectorAll('.message');
+                        if (msgs.length >= 1) {
+                            const lastMsg = msgs[msgs.length - 1];
+                            const btns = lastMsg.querySelector('.button-group');
+                            if (btns) btns.style.display = 'none';
+                        }
+                        askForAnswerGroup();
+                    }}
+                ]
+            );
+        }
+        
+        function confirmAnswerGroup(groupKey) {
+            state.questionGroups[state.currentQuestionSetup] = groupKey;
+            
+            // Hide the confirmation buttons
+            const messages = chatContainer.querySelectorAll('.message');
+            if (messages.length >= 1) {
+                const prevMessage = messages[messages.length - 1];
+                const buttonGroup = prevMessage.querySelector('.button-group');
+                if (buttonGroup) {
+                    buttonGroup.style.display = 'none';
+                }
+            }
+            
+            state.currentQuestionSetup++;
+            
+            const groupName = ANSWER_GROUPS[groupKey].name;
+            addMessage(`✅ "${groupName}" selected!`, true);
+            
+            setTimeout(() => {
+                askForAnswerGroup();
+            }, 500);
+        }
+
+        function finishSetup() {
+            saveState();
+            state.phase = 'configured';
+            
+            hideInput();
+            addMessage(`🎉 Perfect! Your framework is configured.`, true);
+            
+            setTimeout(() => {
+                let summary = `📋 Your Setup:\n\nPairs: ${state.pairs.join(', ')}\n\nQuestions:\n`;
+                state.questions.forEach((q, i) => {
+                    const groupName = ANSWER_GROUPS[state.questionGroups[i]].name;
+                    summary += `${i + 1}. ${q} (${groupName})\n`;
+                });
+                
+                addMessage(
+                    summary,
+                    true,
+                    [{ text: '▶ Start First Session', class: 'btn-primary', action: startSession }]
+                );
+            }, 500);
+        }
+
+        // ============================================
+        // SESSION FLOW
+        // ============================================
+        
+        function startSession() {
+            state.phase = 'session';
+            state.currentPairIndex = 0;
+            state.currentQuestionIndex = 0;
+            state.answers = {};
+            state.timestamp = new Date().toLocaleString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            
+            addMessage("✅ Session started!\n\nAnswer each question thoughtfully.\n\nRemember: If you're rushing, that's your signal to pause.", true);
+            
+            // Force scroll to bottom at session start
+            forceScrollToAnchor();
+            
+            setTimeout(() => {
+                askNextQuestion();
+            }, 800);
+        }
+
+        function askNextQuestion() {
+            if (state.currentPairIndex >= state.pairs.length) {
+                generateSnapshot();
+                return;
+            }
+            
+            const pair = state.pairs[state.currentPairIndex];
+            const question = state.questions[state.currentQuestionIndex];
+            const groupKey = state.questionGroups[state.currentQuestionIndex];
+            const answerGroup = ANSWER_GROUPS[groupKey];
+            
+            // Initialize answers for this pair if needed
+            if (!state.answers[pair]) {
+                state.answers[pair] = [];
+            }
+            
+            // Create buttons from answer group
+            const buttons = answerGroup.answers.map(answer => ({
+                text: answer.text,
+                class: `btn-verdict ${answer.class}`,
+                action: () => handleAnswer(answer.text)
+            }));
+            
+            addMessage(`💡 ${pair}\n\n${question}:`, true, buttons);
+            hideInput();
+        }
+
+        function handleAnswer(answer) {
+            const pair = state.pairs[state.currentPairIndex];
+            state.answers[pair].push(answer);
+            
+            addMessage(answer, false);
+            
+            // Remove the previous message's buttons to prevent clicking again
+            const messages = chatContainer.querySelectorAll('.message');
+            if (messages.length >= 2) {
+                const prevMessage = messages[messages.length - 2];
+                const buttonGroup = prevMessage.querySelector('.button-group');
+                if (buttonGroup) {
+                    buttonGroup.style.display = 'none';
+                }
+            }
+            
+            // Move to next question
+            state.currentQuestionIndex++;
+            if (state.currentQuestionIndex >= state.questions.length) {
+                state.currentPairIndex++;
+                state.currentQuestionIndex = 0;
+                
+                if (state.currentPairIndex < state.pairs.length) {
+                    setTimeout(() => {
+                        addMessage(`✓ ${pair} complete\n\n→ Moving to ${state.pairs[state.currentPairIndex]}`, true);
+                        setTimeout(askNextQuestion, 500);
+                    }, 300);
+                    return;
+                }
+            }
+            
+            setTimeout(askNextQuestion, 300);
+        }
+
+        // ============================================
+        // SNAPSHOT GENERATION
+        // ============================================
+        
+        function generateSnapshot() {
+            addMessage("✅ Checklist completed!\n\nGenerating your trading snapshot...", true);
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                const canvas = createSnapshotCanvas();
+                const dataURL = canvas.toDataURL('image/png');
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message message-bot';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-label">Trading Partner</div>
+                        <div class="message-bubble">
+                            📸 Your Trading Plan Snapshot
+                            <div class="snapshot-container">
+                                <img src="${dataURL}" class="snapshot-image" id="snapshotImage" alt="Trading Plan">
+                                <div class="snapshot-actions">
+                                    <button class="btn btn-primary" id="downloadBtn">💾 Download</button>
+                                    <button class="btn btn-verdict" id="newSessionBtn">🔄 New Session</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const anchor = document.getElementById('scrollAnchor');
+                chatContainer.insertBefore(messageDiv, anchor);
+                scrollToAnchor();
+                
+                // Add event listeners
+                document.getElementById('downloadBtn').onclick = () => downloadSnapshot(dataURL);
+                document.getElementById('newSessionBtn').onclick = startSession;
+                document.getElementById('snapshotImage').onclick = () => viewFullscreen(dataURL);
+            }, 1500);
+        }
+
+        function createSnapshotCanvas() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Dimensions
+            const width = 1200;
+            const padding = 60;
+            const headerHeight = 180;
+            const rowHeight = 70;
+            const footerHeight = 50;
+            const numRows = state.pairs.length;
+            const numCols = state.questions.length + 1; // +1 for pair column
+            const height = headerHeight + (numRows * rowHeight) + footerHeight + (padding * 2);
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Colors
+            const bgPrimary = '#0A0E27';
+            const bgHeader = '#1A1F3A';
+            const accentCyan = '#00D9FF';
+            const accentPurple = '#7B61FF';
+            const textPrimary = '#FFFFFF';
+            const textSecondary = '#B8C5D6';
+            const border = '#2D3548';
+            const rowAlt = '#111628';
+            const verdictBuy = '#00FF94';
+            const verdictSell = '#FF4757';
+            const verdictStandby = '#FFB800';
+            
+            // Background
+            ctx.fillStyle = bgPrimary;
+            ctx.fillRect(0, 0, width, height);
+            
+            let currentY = padding;
+            
+            // ========== HEADER ==========
+            ctx.fillStyle = bgHeader;
+            ctx.fillRect(padding, currentY, width - padding * 2, headerHeight);
+            
+            const gradientTop = ctx.createLinearGradient(padding, 0, width - padding, 0);
+            gradientTop.addColorStop(0, accentCyan);
+            gradientTop.addColorStop(1, accentPurple);
+            ctx.fillStyle = gradientTop;
+            ctx.fillRect(padding, currentY, width - padding * 2, 4);
+            
+            ctx.fillStyle = textPrimary;
+            ctx.font = 'bold 36px serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('TRADING PLAN SNAPSHOT', width / 2, currentY + 60);
+            
+            ctx.fillStyle = accentCyan;
+            ctx.font = '18px monospace';
+            ctx.fillText(state.timestamp, width / 2, currentY + 100);
+            
+            const accentWidth = 100;
+            const accentY = currentY + 120;
+            ctx.fillStyle = accentPurple;
+            ctx.fillRect(width / 2 - accentWidth / 2, accentY, accentWidth, 2);
+            
+            currentY += headerHeight;
+            
+            // ========== TABLE HEADER ==========
+            const pairColWidth = 180;
+            const remainingWidth = width - (padding * 2) - pairColWidth;
+            const questionColWidth = remainingWidth / state.questions.length;
+            
+            ctx.fillStyle = bgHeader;
+            ctx.fillRect(padding, currentY, width - padding * 2, rowHeight);
+            
+            ctx.fillStyle = accentCyan;
+            ctx.font = 'bold 16px monospace';
+            ctx.textAlign = 'left';
+            
+            let colX = padding + 20;
+            
+            ctx.fillText('PAIR', colX, currentY + rowHeight / 2 + 6);
+            colX += pairColWidth;
+            
+            state.questions.forEach((question, i) => {
+                // Extract text between quotes for column header, or use full question
+                const quotedMatch = question.match(/"([^"]+)"/);
+                const columnText = quotedMatch ? quotedMatch[1] : question;
+                
+                const text = columnText.toUpperCase();
+                const maxWidth = questionColWidth - 40;
+                
+                const words = text.split(' ');
+                let lines = [];
+                let currentLine = '';
+                
+                words.forEach(word => {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                if (currentLine) lines.push(currentLine);
+                
+                if (lines.length === 1) {
+                    ctx.fillText(lines[0], colX, currentY + rowHeight / 2 + 6);
+                } else {
+                    const lineHeight = 18;
+                    const startY = currentY + (rowHeight - lines.length * lineHeight) / 2 + 6;
+                    lines.slice(0, 2).forEach((line, idx) => {
+                        ctx.fillText(line, colX, startY + idx * lineHeight);
+                    });
+                }
+                
+                if (i < state.questions.length - 1) {
+                    ctx.fillStyle = border;
+                    ctx.fillRect(colX - 10, currentY + 15, 2, rowHeight - 30);
+                    ctx.fillStyle = accentCyan;
+                }
+                
+                colX += questionColWidth;
+            });
+            
+            currentY += rowHeight;
+            
+            // ========== TABLE ROWS ==========
+            state.pairs.forEach((pair, rowIdx) => {
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = rowAlt;
+                    ctx.fillRect(padding, currentY, width - padding * 2, rowHeight);
+                }
+                
+                ctx.fillStyle = border;
+                ctx.fillRect(padding, currentY, width - padding * 2, 1);
+                
+                colX = padding + 20;
+                
+                ctx.fillStyle = textPrimary;
+                ctx.font = '15px monospace';
+                ctx.textAlign = 'left';
+                ctx.fillText(pair, colX, currentY + rowHeight / 2 + 6);
+                colX += pairColWidth;
+                
+                const pairAnswers = state.answers[pair] || [];
+                pairAnswers.forEach((answer, ansIdx) => {
+                    // Color code based on emoji/keyword
+                    let color = textSecondary;
+                    if (answer.includes('📈') || answer.includes('⬆️') || answer.includes('▲') || 
+                        answer.includes('Bullish') || answer.includes('Buy') || answer.includes('HL/HH')) {
+                        color = verdictBuy;
+                    } else if (answer.includes('📉') || answer.includes('⬇️') || answer.includes('▼') || 
+                               answer.includes('Bearish') || answer.includes('Sell') || answer.includes('LH/LL')) {
+                        color = verdictSell;
+                    } else if (answer.includes('↔️') || answer.includes('➡️') || answer.includes('■') || 
+                               answer.includes('Sideways') || answer.includes('Stand by') || answer.includes('Choppy')) {
+                        color = verdictStandby;
+                    }
+                    
+                    ctx.fillStyle = color;
+                    ctx.font = 'bold 15px monospace';
+                    
+                    const maxWidth = questionColWidth - 40;
+                    let displayText = answer;
+                    if (ctx.measureText(answer).width > maxWidth) {
+                        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
+                            displayText = displayText.slice(0, -1);
+                        }
+                        displayText += '...';
+                    }
+                    
+                    ctx.fillText(displayText, colX, currentY + rowHeight / 2 + 6);
+                    
+                    if (ansIdx < state.questions.length - 1) {
+                        ctx.fillStyle = border;
+                        ctx.fillRect(colX - 10, currentY + 15, 2, rowHeight - 30);
+                    }
+                    
+                    colX += questionColWidth;
+                });
+                
+                currentY += rowHeight;
+            });
+            
+            // ========== FOOTER ==========
+            const gradientBottom = ctx.createLinearGradient(padding, 0, width - padding, 0);
+            gradientBottom.addColorStop(0, accentCyan);
+            gradientBottom.addColorStop(1, accentPurple);
+            ctx.fillStyle = gradientBottom;
+            ctx.fillRect(padding, currentY, width - padding * 2, 2);
+            
+            currentY += 30;
+            
+            ctx.fillStyle = textSecondary;
+            ctx.font = '14px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Trade with discipline. Protect your capital. Trust your process.', width / 2, currentY);
+            
+            return canvas;
+        }
+
+        function downloadSnapshot(dataURL) {
+            try {
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 10);
+                link.download = `trading-plan-${timestamp}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => {
+                    addMessage("✅ Snapshot downloaded! Check your Downloads folder.", true);
+                }, 300);
+            } catch (error) {
+                window.open(dataURL, '_blank');
+                addMessage("📸 Snapshot opened in new tab. Right-click to save image.", true);
+            }
+        }
+
+        function viewFullscreen(dataURL) {
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(`
+                    <html>
+                    <head><title>Trading Plan Snapshot</title>
+                    <style>
+                        body { margin: 0; background: #000; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+                        img { max-width: 100%; max-height: 100vh; cursor: pointer; }
+                    </style>
+                    </head>
+                    <body><img src="${dataURL}" onclick="window.close()" title="Click to close" /></body>
+                    </html>
+                `);
+                win.document.close();
+            } else {
+                const imgWin = document.createElement('div');
+                imgWin.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;';
+                imgWin.innerHTML = `<img src="${dataURL}" style="max-width:90%;max-height:90%;box-shadow:0 0 50px rgba(0,217,255,0.3);">`;
+                imgWin.onclick = () => imgWin.remove();
+                document.body.appendChild(imgWin);
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        sendBtn.addEventListener('click', () => {
+            const value = messageInput.value.trim();
+            if (!value) return;
+            
+            if (state.phase === 'setup') {
+                addMessage(value, false);
+                hideInput();
+                setTimeout(() => handleSetupInput(value), 300);
+            }
+        });
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        loadState();
+        showWelcome();
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
+            `));
+        }
+    </script>
+</body>
+</html>
