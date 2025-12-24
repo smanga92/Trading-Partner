@@ -1,8 +1,0 @@
-8278043286:AAE5dWs_jN0CKjjCL0qrCu_E7312ux_SO0s
-
-# Instructions:
-# 1. Get your bot token from @BotFather on Telegram
-# 2. Replace the line above with your actual token
-# 3. It should look like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
-# 4. Save this file
-# 5. IMPORTANT: Never share this token publicly!
