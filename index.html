@@ -530,6 +530,402 @@
             background: var(--accent-cyan);
         }
 
+        /* Settings Modal - Back Office */
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .settings-overlay.show {
+            display: flex;
+        }
+
+        .settings-panel {
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: 20px;
+            border-bottom: 2px solid var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .settings-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-settings-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-settings-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .settings-content {
+            padding: 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-list {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .config-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .config-item:hover {
+            border-color: var(--accent-cyan);
+            transform: translateX(4px);
+        }
+
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-item-content {
+            flex: 1;
+        }
+
+        .config-item-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .config-item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .config-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .icon-btn.edit:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .icon-btn.delete:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: var(--bg-tertiary);
+        }
+
+        .import-export-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .settings-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .settings-btn.import {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .settings-btn.import:hover {
+            background: var(--accent-purple);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .settings-btn.export {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .settings-btn.export:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+
+        .save-settings-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .save-settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 217, 255, 0.5);
+        }
+
+        /* Edit Form Modal */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-modal.show {
+            display: flex;
+        }
+
+        .edit-form {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .edit-form-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .form-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-btn.cancel {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .form-btn.cancel:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .form-btn.save {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: var(--text-primary);
+        }
+
+        .form-btn.save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Hidden file input */
+        #importFileInput {
+            display: none;
+        }
+
         /* Scroll to Bottom Button - WhatsApp Style */
         .scroll-to-bottom {
             position: fixed;
@@ -593,7 +989,12 @@
         <div class="app-header">
             <div class="header-content">
                 <div class="app-title">Trading Partner</div>
-                <div class="status-indicator"></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="icon-btn" id="settingsBtn" style="width: 40px; height: 40px; font-size: 20px;" title="Settings">
+                        ⚙️
+                    </button>
+                    <div class="status-indicator"></div>
+                </div>
             </div>
         </div>
 
@@ -622,6 +1023,68 @@
                     ➤
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <div class="settings-title">⚙️ Configuration</div>
+                <button class="close-settings-btn" id="closeSettingsBtn">✕</button>
+            </div>
+            
+            <div class="settings-content">
+                <!-- Pairs Section -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        📊 Trading Pairs
+                    </div>
+                    <div class="config-list" id="pairsList">
+                        <!-- Pairs will be inserted here -->
+                    </div>
+                    <button class="add-btn" id="addPairBtn">+ Add Pair</button>
+                </div>
+
+                <!-- Questions Section -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        📝 Questions
+                    </div>
+                    <div class="config-list" id="questionsList">
+                        <!-- Questions will be inserted here -->
+                    </div>
+                    <button class="add-btn" id="addQuestionBtn">+ Add Question</button>
+                </div>
+
+                <!-- Import/Export Section -->
+                <div class="settings-section">
+                    <div class="settings-section-title">
+                        💾 Import / Export
+                    </div>
+                    <div class="import-export-btns">
+                        <button class="settings-btn import" id="importBtn">
+                            📥 Import Config
+                        </button>
+                        <button class="settings-btn export" id="exportBtn">
+                            📤 Export Config
+                        </button>
+                    </div>
+                    <input type="file" id="importFileInput" accept=".json">
+                </div>
+
+                <!-- Save Button -->
+                <button class="save-settings-btn" id="saveSettingsBtn">
+                    💾 Save & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-form" id="editForm">
+            <!-- Form content will be dynamically generated -->
         </div>
     </div>
 
@@ -745,6 +1208,370 @@
                 questionGroups: state.questionGroups
             }));
         }
+
+        // ============================================
+        // BACK OFFICE - SETTINGS PANEL
+        // ============================================
+        
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const pairsList = document.getElementById('pairsList');
+        const questionsList = document.getElementById('questionsList');
+        const addPairBtn = document.getElementById('addPairBtn');
+        const addQuestionBtn = document.getElementById('addQuestionBtn');
+        const importBtn = document.getElementById('importBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importFileInput = document.getElementById('importFileInput');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+
+        // Temporary state for editing
+        let tempPairs = [];
+        let tempQuestions = [];
+        let tempQuestionGroups = {};
+
+        // Open settings
+        settingsBtn.addEventListener('click', openSettings);
+        
+        function openSettings() {
+            // Copy current state to temp
+            tempPairs = [...state.pairs];
+            tempQuestions = [...state.questions];
+            tempQuestionGroups = {...state.questionGroups};
+            
+            // Render settings
+            renderSettings();
+            
+            // Show modal
+            settingsOverlay.classList.add('show');
+        }
+
+        // Close settings
+        closeSettingsBtn.addEventListener('click', closeSettings);
+        
+        function closeSettings() {
+            settingsOverlay.classList.remove('show');
+        }
+
+        // Save settings
+        saveSettingsBtn.addEventListener('click', saveSettings);
+        
+        function saveSettings() {
+            // Validate
+            if (tempPairs.length === 0) {
+                alert('⚠️ Please add at least one trading pair');
+                return;
+            }
+            
+            if (tempQuestions.length === 0) {
+                alert('⚠️ Please add at least one question');
+                return;
+            }
+            
+            // Apply changes
+            state.pairs = tempPairs;
+            state.questions = tempQuestions;
+            state.questionGroups = tempQuestionGroups;
+            
+            // Save to localStorage
+            saveState();
+            
+            // Update phase
+            state.phase = 'welcome-back';
+            
+            // Close settings
+            closeSettings();
+            
+            // Show success message
+            addMessage('✅ Configuration saved successfully!', true);
+            
+            // Refresh welcome screen
+            showWelcome();
+        }
+
+        // Render settings
+        function renderSettings() {
+            renderPairs();
+            renderQuestions();
+        }
+
+        // Render pairs list
+        function renderPairs() {
+            pairsList.innerHTML = '';
+            
+            if (tempPairs.length === 0) {
+                pairsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 20px;">No pairs configured</div>';
+                return;
+            }
+            
+            tempPairs.forEach((pair, index) => {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <div class="config-item-content">
+                        <div class="config-item-text">${pair}</div>
+                    </div>
+                    <div class="config-item-actions">
+                        <button class="icon-btn edit" onclick="editPair(${index})">✏️</button>
+                        <button class="icon-btn delete" onclick="deletePair(${index})">🗑️</button>
+                    </div>
+                `;
+                pairsList.appendChild(item);
+            });
+        }
+
+        // Render questions list
+        function renderQuestions() {
+            questionsList.innerHTML = '';
+            
+            if (tempQuestions.length === 0) {
+                questionsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 20px;">No questions configured</div>';
+                return;
+            }
+            
+            tempQuestions.forEach((question, index) => {
+                const groupKey = tempQuestionGroups[index];
+                const groupName = groupKey && ANSWER_GROUPS[groupKey] ? ANSWER_GROUPS[groupKey].name : 'Not set';
+                
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <div class="config-item-content">
+                        <div class="config-item-text">${index + 1}. ${question}</div>
+                        <div class="config-item-meta">Answer Group: ${groupName}</div>
+                    </div>
+                    <div class="config-item-actions">
+                        <button class="icon-btn edit" onclick="editQuestion(${index})">✏️</button>
+                        <button class="icon-btn delete" onclick="deleteQuestion(${index})">🗑️</button>
+                    </div>
+                `;
+                questionsList.appendChild(item);
+            });
+        }
+
+        // Add pair
+        addPairBtn.addEventListener('click', () => {
+            showEditForm('pair', -1, '');
+        });
+
+        // Add question
+        addQuestionBtn.addEventListener('click', () => {
+            showEditForm('question', -1, '', 'bias');
+        });
+
+        // Edit pair
+        window.editPair = function(index) {
+            showEditForm('pair', index, tempPairs[index]);
+        };
+
+        // Delete pair
+        window.deletePair = function(index) {
+            if (confirm(`Delete "${tempPairs[index]}"?`)) {
+                tempPairs.splice(index, 1);
+                renderPairs();
+            }
+        };
+
+        // Edit question
+        window.editQuestion = function(index) {
+            showEditForm('question', index, tempQuestions[index], tempQuestionGroups[index]);
+        };
+
+        // Delete question
+        window.deleteQuestion = function(index) {
+            if (confirm(`Delete question "${tempQuestions[index]}"?`)) {
+                tempQuestions.splice(index, 1);
+                // Rebuild question groups
+                const newGroups = {};
+                Object.keys(tempQuestionGroups).forEach(key => {
+                    const idx = parseInt(key);
+                    if (idx < index) {
+                        newGroups[idx] = tempQuestionGroups[idx];
+                    } else if (idx > index) {
+                        newGroups[idx - 1] = tempQuestionGroups[idx];
+                    }
+                });
+                tempQuestionGroups = newGroups;
+                renderQuestions();
+            }
+        };
+
+        // Show edit form
+        function showEditForm(type, index, value, groupKey = null) {
+            editForm.innerHTML = '';
+            
+            if (type === 'pair') {
+                editForm.innerHTML = `
+                    <div class="edit-form-title">${index === -1 ? 'Add' : 'Edit'} Trading Pair</div>
+                    <div class="form-group">
+                        <label class="form-label">Pair Symbol</label>
+                        <input type="text" class="form-input" id="editInput" value="${value}" placeholder="e.g., EURUSD">
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
+                        <button class="form-btn save" onclick="savePairEdit(${index})">Save</button>
+                    </div>
+                `;
+            } else {
+                const groupOptions = Object.keys(ANSWER_GROUPS).map(key => {
+                    const selected = key === groupKey ? 'selected' : '';
+                    return `<option value="${key}" ${selected}>${ANSWER_GROUPS[key].name}</option>`;
+                }).join('');
+                
+                editForm.innerHTML = `
+                    <div class="edit-form-title">${index === -1 ? 'Add' : 'Edit'} Question</div>
+                    <div class="form-group">
+                        <label class="form-label">Question Text</label>
+                        <input type="text" class="form-input" id="editInput" value="${value}" placeholder='e.g., What is your "Daily Bias"?'>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
+                            Tip: Use "quotes" to set column header in snapshot
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Answer Group</label>
+                        <select class="form-select" id="editGroup">
+                            ${groupOptions}
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
+                        <button class="form-btn save" onclick="saveQuestionEdit(${index})">Save</button>
+                    </div>
+                `;
+            }
+            
+            editModal.classList.add('show');
+            setTimeout(() => {
+                document.getElementById('editInput').focus();
+            }, 100);
+        }
+
+        // Close edit form
+        window.closeEditForm = function() {
+            editModal.classList.remove('show');
+        };
+
+        // Save pair edit
+        window.savePairEdit = function(index) {
+            const input = document.getElementById('editInput');
+            const value = input.value.trim().toUpperCase();
+            
+            if (!value) {
+                alert('⚠️ Please enter a pair symbol');
+                return;
+            }
+            
+            if (index === -1) {
+                tempPairs.push(value);
+            } else {
+                tempPairs[index] = value;
+            }
+            
+            renderPairs();
+            closeEditForm();
+        };
+
+        // Save question edit
+        window.saveQuestionEdit = function(index) {
+            const input = document.getElementById('editInput');
+            const groupSelect = document.getElementById('editGroup');
+            const value = input.value.trim();
+            const groupKey = groupSelect.value;
+            
+            if (!value) {
+                alert('⚠️ Please enter a question');
+                return;
+            }
+            
+            if (index === -1) {
+                tempQuestions.push(value);
+                tempQuestionGroups[tempQuestions.length - 1] = groupKey;
+            } else {
+                tempQuestions[index] = value;
+                tempQuestionGroups[index] = groupKey;
+            }
+            
+            renderQuestions();
+            closeEditForm();
+        };
+
+        // Export configuration
+        exportBtn.addEventListener('click', exportConfig);
+        
+        function exportConfig() {
+            const config = {
+                version: '1.0',
+                timestamp: new Date().toISOString(),
+                pairs: tempPairs,
+                questions: tempQuestions.map((q, i) => ({
+                    text: q,
+                    group: tempQuestionGroups[i]
+                }))
+            };
+            
+            const json = JSON.stringify(config, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+            link.download = `trading_config_${date}.json`;
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            addMessage('📤 Configuration exported successfully!', true);
+        }
+
+        // Import configuration
+        importBtn.addEventListener('click', () => {
+            importFileInput.click();
+        });
+        
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const config = JSON.parse(event.target.result);
+                    
+                    // Validate
+                    if (!config.pairs || !Array.isArray(config.pairs)) {
+                        throw new Error('Invalid configuration: pairs missing');
+                    }
+                    if (!config.questions || !Array.isArray(config.questions)) {
+                        throw new Error('Invalid configuration: questions missing');
+                    }
+                    
+                    // Load configuration
+                    tempPairs = config.pairs;
+                    tempQuestions = [];
+                    tempQuestionGroups = {};
+                    
+                    config.questions.forEach((q, i) => {
+                        tempQuestions.push(q.text);
+                        tempQuestionGroups[i] = q.group || 'bias';
+                    });
+                    
+                    // Render
+                    renderSettings();
+                    
+                    addMessage('📥 Configuration imported successfully!', true);
+                } catch (error) {
+                    alert('❌ Invalid configuration file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input
+            e.target.value = '';
+        });
 
         // ============================================
         // UI FUNCTIONS
