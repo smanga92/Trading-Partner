@@ -1101,6 +1101,23 @@
                     { text: '↔️ Sideways', class: 'standby' }
                 ]
             },
+            momentum: {
+                name: 'Momentum',
+                answers: [
+                    { text: '🔥 Bullish Strong', class: 'buy' },
+                    { text: '📈 Bullish', class: 'buy' },
+                    { text: '🌅 Bullish Building', class: 'buy' },
+                    { text: '🌤️ Bullish Fading', class: 'standby' },
+                    { text: '⚡ Bullish Shifting', class: 'standby' },
+                    { text: '🔄 Bullish Exhausted', class: 'standby' },
+                    { text: '❄️ Bearish Strong', class: 'sell' },
+                    { text: '📉 Bearish', class: 'sell' },
+                    { text: '🌑 Bearish Building', class: 'sell' },
+                    { text: '🌥️ Bearish Fading', class: 'standby' },
+                    { text: '⚡ Bearish Shifting', class: 'standby' },
+                    { text: '🔄 Bearish Exhausted', class: 'standby' }
+                ]
+            },
             flow: {
                 name: 'Order Flow',
                 answers: [
@@ -2253,16 +2270,33 @@
                 
                 const pairAnswers = state.answers[pair] || [];
                 pairAnswers.forEach((answer, ansIdx) => {
+                    // Smart abbreviation for snapshot readability
+                    let displayText = answer;
+                    
+                    // Abbreviate "Bullish" and "Bearish" for momentum answers
+                    if (answer.includes('Bullish Strong')) displayText = answer.replace('Bullish Strong', 'Bull. Strong');
+                    else if (answer.includes('Bullish Building')) displayText = answer.replace('Bullish Building', 'Bull. Building');
+                    else if (answer.includes('Bullish Fading')) displayText = answer.replace('Bullish Fading', 'Bull. Fading');
+                    else if (answer.includes('Bullish Shifting')) displayText = answer.replace('Bullish Shifting', 'Bull. Shifting');
+                    else if (answer.includes('Bullish Exhausted')) displayText = answer.replace('Bullish Exhausted', 'Bull. Exhaust.');
+                    else if (answer.includes('Bearish Strong')) displayText = answer.replace('Bearish Strong', 'Bear. Strong');
+                    else if (answer.includes('Bearish Building')) displayText = answer.replace('Bearish Building', 'Bear. Building');
+                    else if (answer.includes('Bearish Fading')) displayText = answer.replace('Bearish Fading', 'Bear. Fading');
+                    else if (answer.includes('Bearish Shifting')) displayText = answer.replace('Bearish Shifting', 'Bear. Shifting');
+                    else if (answer.includes('Bearish Exhausted')) displayText = answer.replace('Bearish Exhausted', 'Bear. Exhaust.');
+                    
                     // Color code based on emoji/keyword
                     let color = textSecondary;
-                    if (answer.includes('📈') || answer.includes('⬆️') || answer.includes('▲') || 
+                    if (answer.includes('📈') || answer.includes('⬆️') || answer.includes('▲') || answer.includes('🔥') || answer.includes('🌅') ||
                         answer.includes('Bullish') || answer.includes('Buy') || answer.includes('HL/HH')) {
                         color = verdictBuy;
-                    } else if (answer.includes('📉') || answer.includes('⬇️') || answer.includes('▼') || 
+                    } else if (answer.includes('📉') || answer.includes('⬇️') || answer.includes('▼') || answer.includes('❄️') || answer.includes('🌑') ||
                                answer.includes('Bearish') || answer.includes('Sell') || answer.includes('LH/LL')) {
                         color = verdictSell;
-                    } else if (answer.includes('↔️') || answer.includes('➡️') || answer.includes('■') || 
-                               answer.includes('Sideways') || answer.includes('Stand by') || answer.includes('Choppy')) {
+                    } else if (answer.includes('↔️') || answer.includes('➡️') || answer.includes('■') || answer.includes('🌤️') || answer.includes('🌥️') || 
+                               answer.includes('⚡') || answer.includes('🔄') ||
+                               answer.includes('Sideways') || answer.includes('Stand by') || answer.includes('Choppy') ||
+                               answer.includes('Fading') || answer.includes('Shifting') || answer.includes('Exhausted')) {
                         color = verdictStandby;
                     }
                     
@@ -2270,8 +2304,8 @@
                     ctx.font = 'bold 15px monospace';
                     
                     const maxWidth = questionColWidth - 40;
-                    let displayText = answer;
-                    if (ctx.measureText(answer).width > maxWidth) {
+                    // Only truncate if still too long after abbreviation
+                    if (ctx.measureText(displayText).width > maxWidth) {
                         while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
                             displayText = displayText.slice(0, -1);
                         }
