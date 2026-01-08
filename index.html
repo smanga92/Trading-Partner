@@ -113,6 +113,36 @@
             letter-spacing: -1px;
         }
 
+        .back-btn {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 10px;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn.show {
+            display: flex;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            transform: translateX(-4px);
+        }
+
+        .back-btn:active {
+            transform: translateX(-2px);
+        }
+
         .status-indicator {
             width: 12px;
             height: 12px;
@@ -988,6 +1018,7 @@
         <!-- Header -->
         <div class="app-header">
             <div class="header-content">
+                <button class="back-btn" id="backBtn">← Back</button>
                 <div class="app-title">Trading Partner</div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <button class="icon-btn" id="settingsBtn" style="width: 40px; height: 40px; font-size: 20px;" title="Settings">
@@ -1199,8 +1230,11 @@
             currentQuestionIndex: 0,
             answers: {},
             timestamp: '',
-            setupStep: 'pairs' // 'pairs', 'question-count', 'questions', 'groups'
+            setupStep: 'pairs', // 'pairs', 'question-count', 'questions', 'groups'
+            answerHistory: [] // Track answers for back functionality
         };
+
+        const backBtn = document.getElementById('backBtn');
 
         // Load state from localStorage
         function loadState() {
@@ -1331,6 +1365,8 @@
                         <div class="config-item-text">${pair}</div>
                     </div>
                     <div class="config-item-actions">
+                        ${index > 0 ? '<button class="icon-btn" onclick="movePairUp(' + index + ')" title="Move up">↑</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↑</button>'}
+                        ${index < tempPairs.length - 1 ? '<button class="icon-btn" onclick="movePairDown(' + index + ')" title="Move down">↓</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↓</button>'}
                         <button class="icon-btn edit" onclick="editPair(${index})">✏️</button>
                         <button class="icon-btn delete" onclick="deletePair(${index})">🗑️</button>
                     </div>
@@ -1360,6 +1396,8 @@
                         <div class="config-item-meta">Answer Group: ${groupName}</div>
                     </div>
                     <div class="config-item-actions">
+                        ${index > 0 ? '<button class="icon-btn" onclick="moveQuestionUp(' + index + ')" title="Move up">↑</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↑</button>'}
+                        ${index < tempQuestions.length - 1 ? '<button class="icon-btn" onclick="moveQuestionDown(' + index + ')" title="Move down">↓</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↓</button>'}
                         <button class="icon-btn edit" onclick="editQuestion(${index})">✏️</button>
                         <button class="icon-btn delete" onclick="deleteQuestion(${index})">🗑️</button>
                     </div>
@@ -1373,10 +1411,64 @@
             showEditForm('pair', -1, '');
         });
 
+        // Move pair up
+        window.movePairUp = function(index) {
+            if (index > 0) {
+                const temp = tempPairs[index];
+                tempPairs[index] = tempPairs[index - 1];
+                tempPairs[index - 1] = temp;
+                renderPairs();
+            }
+        };
+
+        // Move pair down
+        window.movePairDown = function(index) {
+            if (index < tempPairs.length - 1) {
+                const temp = tempPairs[index];
+                tempPairs[index] = tempPairs[index + 1];
+                tempPairs[index + 1] = temp;
+                renderPairs();
+            }
+        };
+
         // Add question
         addQuestionBtn.addEventListener('click', () => {
             showEditForm('question', -1, '', 'bias');
         });
+
+        // Move question up
+        window.moveQuestionUp = function(index) {
+            if (index > 0) {
+                // Swap questions
+                const temp = tempQuestions[index];
+                tempQuestions[index] = tempQuestions[index - 1];
+                tempQuestions[index - 1] = temp;
+                
+                // Swap groups
+                const tempGroup = tempQuestionGroups[index];
+                tempQuestionGroups[index] = tempQuestionGroups[index - 1];
+                tempQuestionGroups[index - 1] = tempGroup;
+                
+                renderQuestions();
+            }
+        };
+
+        // Move question down
+        window.moveQuestionDown = function(index) {
+            if (index < tempQuestions.length - 1) {
+                // Swap questions
+                const temp = tempQuestions[index];
+                tempQuestions[index] = tempQuestions[index + 1];
+                tempQuestions[index + 1] = temp;
+                
+                // Swap groups
+                const tempGroup = tempQuestionGroups[index];
+                tempQuestionGroups[index] = tempQuestionGroups[index + 1];
+                tempQuestionGroups[index + 1] = tempGroup;
+                
+                renderQuestions();
+            }
+        };
 
         // Edit pair
         window.editPair = function(index) {
@@ -1732,6 +1824,45 @@
             }
         });
 
+        // Back button functionality
+        backBtn.addEventListener('click', goBackOneQuestion);
+
+        function goBackOneQuestion() {
+            // Can only go back during active session
+            if (state.phase !== 'session' || state.answerHistory.length === 0) {
+                return;
+            }
+
+            // Get last answer from history
+            const lastAnswer = state.answerHistory.pop();
+            
+            // Remove that answer from state
+            const pair = state.pairs[lastAnswer.pairIndex];
+            if (state.answers[pair] && state.answers[pair].length > 0) {
+                state.answers[pair].pop();
+            }
+
+            // Update current position
+            state.currentPairIndex = lastAnswer.pairIndex;
+            state.currentQuestionIndex = lastAnswer.questionIndex;
+
+            // Remove last 2 messages (answer + question or just answer)
+            const messages = chatContainer.querySelectorAll('.message');
+            if (messages.length >= 1) {
+                // Remove last message (the user's answer or next question)
+                messages[messages.length - 1].remove();
+            }
+            if (messages.length >= 2) {
+                // Remove the question that was answered
+                messages[messages.length - 2].remove();
+            }
+
+            // Re-ask the question
+            setTimeout(() => {
+                askNextQuestion();
+            }, 100);
+        }
+
         function clearChat() {
             chatContainer.innerHTML = '';
             // Re-add anchor
@@ -2004,6 +2135,7 @@
             state.currentPairIndex = 0;
             state.currentQuestionIndex = 0;
             state.answers = {};
+            state.answerHistory = [];
             state.timestamp = new Date().toLocaleString('en-GB', {
                 day: '2-digit',
                 month: 'short',
@@ -2014,6 +2146,9 @@
             });
             
             addMessage("✅ Session started!\n\nAnswer each question thoughtfully.\n\nRemember: If you're rushing, that's your signal to pause.", true);
+            
+            // Show back button
+            backBtn.classList.add('show');
             
             // Force scroll to bottom at session start
             forceScrollToAnchor();
@@ -2052,6 +2187,14 @@
 
         function handleAnswer(answer) {
             const pair = state.pairs[state.currentPairIndex];
+            
+            // Save to history before adding new answer
+            state.answerHistory.push({
+                pairIndex: state.currentPairIndex,
+                questionIndex: state.currentQuestionIndex,
+                answer: answer
+            });
+            
             state.answers[pair].push(answer);
             
             addMessage(answer, false);
@@ -2089,6 +2232,9 @@
         // ============================================
         
         function generateSnapshot() {
+            // Hide back button when session complete
+            backBtn.classList.remove('show');
+            
             addMessage("✅ Checklist completed!\n\nGenerating your trading snapshot...", true);
             showLoading();
             
