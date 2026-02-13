@@ -1009,11 +1009,16 @@ const BUILTIN_GROUPS = {
     liquidity: {
         name: 'Liquidity',
         answers: [
-            { text: '💧 Equal Highs', class: '' },
-            { text: '🌊 Equal Lows', class: '' },
-            { text: '🎯 Sweep', class: '' },
-            { text: '📊 Pool Above', class: '' },
-            { text: '📉 Pool Below', class: '' }
+            { text: '🎯 Int. Taken → Ext. Above', class: 'buy' },
+            { text: '🎯 Int. Taken → Ext. Below', class: 'sell' },
+            { text: '💥 Ext. Taken → Extending Up', class: 'buy' },
+            { text: '💥 Ext. Taken → Extending Down', class: 'sell' },
+            { text: '👀 Targeting Int. Above', class: 'standby' },
+            { text: '👀 Targeting Int. Below', class: 'standby' },
+            { text: '👀 Targeting Ext. Above', class: 'buy' },
+            { text: '👀 Targeting Ext. Below', class: 'sell' },
+            { text: '↔️ Int. & Ext. Mixed', class: 'standby' },
+            { text: '⏸ No Clear Target', class: 'standby' }
         ]
     },
     volume: {
@@ -1033,7 +1038,8 @@ const BUILTIN_GROUPS = {
 const STORAGE_KEYS = {
     CONFIG: 'tradingPartner_config',
     SESSIONS: 'tradingPartner_sessions',
-    CUSTOM_GROUPS: 'tradingPartner_customGroups'
+    CUSTOM_GROUPS: 'tradingPartner_customGroups',
+    DRAFT: 'tradingPartner_draft'
 };
 
 // ============================================
@@ -1086,7 +1092,9 @@ function loadConfig() {
             state.questionGroups = parsed.questionGroups || {};
             state.customGroups = loadCustomGroups();
             if (state.pairs.length && state.questions.length) {
-                state.phase = 'welcome-back';
+                // Check if there's an unfinished session draft
+                const draft = loadDraft();
+                state.phase = draft ? 'draft-resume' : 'welcome-back';
             }
         }
     } catch(e) {}
@@ -1123,6 +1131,32 @@ function deleteSession(index) {
 
 function clearAllSessions() {
     localStorage.removeItem(STORAGE_KEYS.SESSIONS);
+}
+
+// ============================================
+// DRAFT (in-progress session) PERSISTENCE
+// ============================================
+function saveDraft() {
+    if (state.phase !== 'session') return;
+    const draft = {
+        timestamp: state.timestamp,
+        currentPairIndex: state.currentPairIndex,
+        currentQuestionIndex: state.currentQuestionIndex,
+        answers: JSON.parse(JSON.stringify(state.answers)),
+        answerHistory: [...state.answerHistory]
+    };
+    localStorage.setItem(STORAGE_KEYS.DRAFT, JSON.stringify(draft));
+}
+
+function loadDraft() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.DRAFT);
+        return saved ? JSON.parse(saved) : null;
+    } catch(e) { return null; }
+}
+
+function clearDraft() {
+    localStorage.removeItem(STORAGE_KEYS.DRAFT);
 }
 
 // ============================================
@@ -1246,7 +1280,21 @@ chatContainer.addEventListener('scroll', () => {
 // ============================================
 function showWelcome() {
     clearChat();
-    if (state.phase === 'welcome-back') {
+    if (state.phase === 'draft-resume') {
+        const draft = loadDraft();
+        const completedPairs = Object.keys(draft.answers || {}).filter(p => (draft.answers[p]||[]).length === state.questions.length);
+        const totalAnswered = Object.values(draft.answers || {}).reduce((sum, a) => sum + a.length, 0);
+        const totalNeeded = state.pairs.length * state.questions.length;
+        const pct = Math.round((totalAnswered / totalNeeded) * 100);
+        addMessage(
+            `⚠️ You have an unfinished session!\n\nStarted: ${draft.timestamp}\nProgress: ${pct}% complete (${totalAnswered}/${totalNeeded} answers)\nPairs done: ${completedPairs.join(', ') || 'none'}\n\nWould you like to continue where you left off?`,
+            true,
+            [
+                { text: '▶ Resume Session', class: 'btn-primary', action: resumeDraft },
+                { text: '🗑 Discard & Start Fresh', class: 'btn-verdict', action: () => { clearDraft(); state.phase = 'welcome-back'; showWelcome(); } }
+            ]
+        );
+    } else if (state.phase === 'welcome-back') {
         addMessage(
             `Welcome back! 💙\n\nPairs: ${state.pairs.join(', ')}\n\nReady to start your session?`,
             true,
@@ -1400,7 +1448,29 @@ function finishSetup() {
 // ============================================
 // SESSION FLOW
 // ============================================
+function resumeDraft() {
+    const draft = loadDraft();
+    if (!draft) { startSession(); return; }
+    state.phase = 'session';
+    state.timestamp = draft.timestamp;
+    state.currentPairIndex = draft.currentPairIndex;
+    state.currentQuestionIndex = draft.currentQuestionIndex;
+    state.answers = draft.answers || {};
+    state.answerHistory = draft.answerHistory || [];
+    backBtn.classList.add('show');
+    clearChat();
+    // Show a brief recap of what was already answered
+    const completedPairs = Object.keys(state.answers).filter(p => (state.answers[p]||[]).length === state.questions.length);
+    let recapMsg = `▶ Resuming session from ${state.timestamp}\n\n`;
+    if (completedPairs.length > 0) recapMsg += `✓ Completed: ${completedPairs.join(', ')}\n\n`;
+    recapMsg += `Continuing with ${state.pairs[state.currentPairIndex]}...`;
+    addMessage(recapMsg, true);
+    forceScrollToAnchor();
+    setTimeout(() => askNextQuestion(), 700);
+}
+
 function startSession() {
+    clearDraft(); // discard any old unfinished session
     state.phase = 'session';
     state.currentPairIndex = 0;
     state.currentQuestionIndex = 0;
@@ -1410,6 +1480,7 @@ function startSession() {
         day: '2-digit', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit', hour12: false
     });
+    saveDraft(); // save immediately so even 0-answer sessions are recoverable
     addMessage("✅ Session started!\n\nAnswer each question thoughtfully.\n\nRemember: If you're rushing, that's your signal to pause.", true);
     backBtn.classList.add('show');
     forceScrollToAnchor();
@@ -1452,12 +1523,15 @@ function handleAnswer(answer) {
         state.currentPairIndex++;
         state.currentQuestionIndex = 0;
         if (state.currentPairIndex < state.pairs.length) {
+            saveDraft(); // save progress after completing a pair
             setTimeout(() => {
                 addMessage(`✓ ${pair} complete\n\n→ Moving to ${state.pairs[state.currentPairIndex]}`, true);
                 setTimeout(askNextQuestion, 500);
             }, 300);
             return;
         }
+    } else {
+        saveDraft(); // save progress after every single answer
     }
     setTimeout(askNextQuestion, 300);
 }
@@ -1481,6 +1555,7 @@ backBtn.addEventListener('click', () => {
 // ============================================
 function generateSnapshot() {
     backBtn.classList.remove('show');
+    clearDraft(); // session complete — remove the draft
     addMessage("✅ Checklist completed!\n\nGenerating your trading snapshot...", true);
     showLoading();
     setTimeout(() => {
@@ -2081,6 +2156,39 @@ messageInput.addEventListener('input', function() {
 settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) closeSettings(); });
 historyOverlay.addEventListener('click', e => { if (e.target === historyOverlay) historyOverlay.classList.remove('show'); });
 editModal.addEventListener('click', e => { if (e.target === editModal) closeEditForm(); });
+
+// ============================================
+// BACKGROUND / VISIBILITY HANDLING
+// Fix for app "closing" when switching away briefly on mobile.
+// On mobile browsers, apps are frozen or killed when backgrounded.
+// We save draft aggressively on ANY visibility loss.
+// ============================================
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        // App going to background — save everything immediately
+        saveDraft();
+    } else if (document.visibilityState === 'visible') {
+        // App came back to foreground
+        // If we were mid-session, the page likely reloaded — state is already
+        // restored via loadConfig() + loadDraft() at init. Nothing extra needed.
+    }
+});
+
+// pagehide fires more reliably than beforeunload on mobile Safari/Chrome
+window.addEventListener('pagehide', () => {
+    saveDraft();
+});
+
+// pageshow fires when page is restored from bfcache (back-forward cache)
+// In this case the JS state is still intact, no reload needed
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+        // Page was restored from bfcache — state still alive, just ensure UI is right
+        if (state.phase === 'session') {
+            backBtn.classList.add('show');
+        }
+    }
+});
 
 // ============================================
 // INIT
