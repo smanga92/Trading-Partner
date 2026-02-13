@@ -7,23 +7,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Your Pre-Trade Accountability Partner">
-    
     <title>Trading Partner</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRyYWRpbmcgUGFydG5lciIsCiAgInNob3J0X25hbWUiOiAiVHJhZGluZyIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBBMEUyNyIsCiAgInRoZW1lX2NvbG9yIjogIiMwQTBFMjciLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnMlM0QlMjdodHRwJTNBJTJGJTJGd3d3LnczLm9yZyUyRjIwMDAlMkZzdmclMjclMjB3aWR0aCUzRCUyNzE5MiUyNyUyMGhlaWdodCUzRCUyNzE5MiUyNyUzRSUzQ3JlY3QlMjB3aWR0aCUzRCUyNzE5MiUyNyUyMGhlaWdodCUzRCUyNzE5MiUyNyUyMGZpbGwlM0QlMjclMjMwQTBFMjclMjclMkYlM0UlM0N0ZXh0JTIweD0lMjc1MCUyNSUyNyUyMHklM0QlMjc1MCUyNSUyNyUyMGZvbnQtc2l6ZSUzRCUyNzgwJTI3JTIwZmlsbCUzRCUyNyUyMzAwRDlGRiUyNyUyMGRvbWluYW50LWJhc2VsaW5lJTNEJTI3bWlkZGxlJTI3JTIwdGV4dC1hbmNob3IlM0QlMjdtaWRkbGUlMjclM0UlRjAlOUYlOTIlQjklM0MlMkZ0ZXh0JTNFJTNDJTJGc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
-    
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg-primary: #0A0E27;
@@ -46,32 +36,22 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
-            position: relative;
         }
 
-        /* Animated background */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(123, 97, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(0, 217, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 183, 0, 0.03) 0%, transparent 50%);
-            animation: pulse 20s ease-in-out infinite;
+                radial-gradient(circle at 20% 30%, rgba(123,97,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0,217,255,0.08) 0%, transparent 50%);
+            animation: bgpulse 20s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
+        @keyframes bgpulse { 0%,100%{opacity:.5} 50%{opacity:1} }
 
-        /* Container */
         .app-container {
             max-width: 100%;
             margin: 0 auto;
@@ -82,12 +62,12 @@
             z-index: 1;
         }
 
-        /* Header */
+        /* ===== HEADER ===== */
         .app-header {
             background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
-            padding: 20px;
+            padding: 14px 20px;
             border-bottom: 2px solid var(--accent-cyan);
-            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0,217,255,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -104,63 +84,65 @@
 
         .app-title {
             font-family: 'Playfair Display', serif;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 900;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -1px;
         }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
 
         .back-btn {
             display: none;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
+            padding: 7px 14px;
             background: var(--bg-tertiary);
             border: 2px solid var(--accent-cyan);
             border-radius: 10px;
             color: var(--accent-cyan);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        .back-btn.show {
-            display: flex;
-        }
-
-        .back-btn:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-primary);
-            transform: translateX(-4px);
-        }
-
-        .back-btn:active {
-            transform: translateX(-2px);
-        }
+        .back-btn.show { display: flex; }
+        .back-btn:hover { background: var(--accent-cyan); color: var(--bg-primary); transform: translateX(-3px); }
 
         .status-indicator {
-            width: 12px;
-            height: 12px;
+            width: 10px; height: 10px;
             background: var(--success);
             border-radius: 50%;
             box-shadow: 0 0 10px var(--success);
             animation: blink 2s infinite;
         }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        /* ===== ICON BUTTONS ===== */
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
+        .icon-btn:hover { transform: scale(1.1); }
+        .icon-btn.edit:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .icon-btn.delete:hover { border-color: var(--danger); color: var(--danger); }
 
-        /* Chat Container - WhatsApp Style */
+        /* ===== CHAT ===== */
         .chat-container {
             flex: 1;
-            padding: 20px 10px 20px 10px; /* Normal padding only! */
+            padding: 20px 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -169,70 +151,33 @@
             width: 100%;
             margin: 0 auto;
             scroll-behavior: smooth;
-            position: relative;
         }
 
-        /* Invisible scroll anchor at the very bottom */
-        .scroll-anchor {
-            height: 1px;
-            width: 1px;
-            visibility: hidden;
-        }
+        .scroll-anchor { height: 1px; width: 1px; visibility: hidden; }
 
-        /* Message Bubbles - Full Width WhatsApp Style */
-        .message {
-            display: flex;
-            width: 100%;
-            animation: slideIn 0.3s ease-out;
-        }
+        .message { display: flex; width: 100%; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .message-bot { justify-content: flex-start; }
+        .message-user { justify-content: flex-end; }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message-bot {
-            justify-content: flex-start;
-        }
-
-        .message-user {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 85%;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
+        .message-content { max-width: 85%; display: flex; flex-direction: column; gap: 4px; }
         .message-bubble {
             padding: 12px 16px;
             border-radius: 12px;
             font-size: 14px;
             line-height: 1.5;
             word-wrap: break-word;
-            position: relative;
         }
-
         .message-bot .message-bubble {
             background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
             border: 1px solid var(--border);
             border-bottom-left-radius: 2px;
         }
-
         .message-user .message-bubble {
             background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
             color: var(--text-primary);
             border-bottom-right-radius: 2px;
         }
-
         .message-label {
             font-size: 10px;
             text-transform: uppercase;
@@ -243,14 +188,8 @@
             margin-bottom: 2px;
         }
 
-        /* Buttons - Wrap nicely */
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-            width: 100%;
-        }
+        /* ===== BUTTONS ===== */
+        .button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; width: 100%; }
 
         .btn {
             padding: 10px 16px;
@@ -261,72 +200,29 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
             flex: 0 1 auto;
             white-space: nowrap;
         }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.4s, height 0.4s;
-        }
-
-        .btn:active::before {
-            width: 200px;
-            height: 200px;
-        }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             color: var(--text-primary);
-            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0,217,255,0.3);
             flex: 1 1 auto;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
-        }
-
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,217,255,0.4); }
         .btn-verdict {
             background: var(--bg-tertiary);
             color: var(--text-primary);
             border: 2px solid var(--border);
         }
+        .btn-verdict:hover { border-color: var(--accent-cyan); background: var(--bg-secondary); transform: scale(1.05); }
+        .btn-verdict.buy { border-color: var(--success); color: var(--success); }
+        .btn-verdict.sell { border-color: var(--danger); color: var(--danger); }
+        .btn-verdict.standby { border-color: var(--warning); color: var(--warning); }
 
-        .btn-verdict:hover {
-            border-color: var(--accent-cyan);
-            background: var(--bg-secondary);
-            transform: scale(1.05);
-        }
-
-        .btn-verdict.buy {
-            border-color: var(--success);
-            color: var(--success);
-        }
-
-        .btn-verdict.sell {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .btn-verdict.standby {
-            border-color: var(--warning);
-            color: var(--warning);
-        }
-
-        /* Input Field */
+        /* ===== INPUT ===== */
         .input-container {
-            padding: 16px 20px;
+            padding: 14px 20px;
             background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             position: sticky;
@@ -335,18 +231,12 @@
             width: 100%;
             margin: 0 auto;
         }
-
-        .input-wrapper {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
+        .input-wrapper { display: flex; gap: 12px; align-items: center; }
         .input-field {
             flex: 1;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border: 2px solid var(--border);
-            border-radius: 16px;
+            border-radius: 14px;
             background: var(--bg-primary);
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
@@ -354,2228 +244,1849 @@
             outline: none;
             transition: all 0.3s ease;
         }
-
-        .input-field:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        .input-field:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(0,217,255,0.1); }
+        .input-field::placeholder { color: var(--text-secondary); }
+        textarea.input-field { resize: vertical; min-height: 46px; max-height: 150px; }
+        .send-btn {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,217,255,0.3);
+            flex-shrink: 0;
         }
+        .send-btn:hover { transform: scale(1.1) rotate(15deg); }
 
-        .input-field::placeholder {
+        /* ===== LOADING ===== */
+        .loading { display: flex; gap: 6px; padding: 12px; }
+        .loading-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-dot:nth-child(1){animation-delay:-.32s}
+        .loading-dot:nth-child(2){animation-delay:-.16s}
+        @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+
+        /* ===== WELCOME ===== */
+        .welcome-screen { text-align: center; padding: 60px 20px; animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        .welcome-icon { font-size: 72px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; display: block; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px; font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .welcome-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
+
+        /* ===== SNAPSHOT ===== */
+        .snapshot-container {
+            margin-top: 12px; padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 8px 30px rgba(0,217,255,0.2);
+        }
+        .snapshot-image {
+            width: 100%; border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .snapshot-image:hover { transform: scale(1.01); }
+        .snapshot-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== HISTORY PANEL ===== */
+        .history-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 6px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .history-card:hover { border-color: var(--accent-cyan); transform: translateX(4px); }
+        .history-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .history-card-time { font-size: 13px; color: var(--accent-cyan); font-weight: 700; }
+        .history-card-pairs { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .history-card-badge {
+            font-size: 11px; padding: 3px 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             color: var(--text-secondary);
         }
 
-        textarea.input-field {
-            resize: vertical;
-            min-height: 48px;
-            max-height: 150px;
-        }
-
-        .send-btn {
-            width: 48px;
-            height: 48px;
+        /* ===== SCROLL TO BOTTOM ===== */
+        .scroll-to-bottom {
+            position: fixed;
+            bottom: 100px; right: 30px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             border: none;
             color: white;
             font-size: 20px;
             cursor: pointer;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
-            flex-shrink: 0;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.1) rotate(15deg);
-        }
-
-        .send-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Snapshot Image */
-        .snapshot-container {
-            margin-top: 12px;
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border-radius: 12px;
-            border: 2px solid var(--accent-cyan);
-            box-shadow: 0 8px 30px rgba(0, 217, 255, 0.2);
-        }
-
-        .snapshot-image {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .snapshot-image:hover {
-            transform: scale(1.02);
-        }
-
-        .snapshot-actions {
-            margin-top: 12px;
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: flex;
-            gap: 6px;
-            padding: 12px;
-        }
-
-        .loading-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-cyan);
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { 
-                transform: scale(0);
-            } 40% { 
-                transform: scale(1);
-            }
-        }
-
-        /* Welcome Screen */
-        .welcome-screen {
-            text-align: center;
-            padding: 60px 20px;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .welcome-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .welcome-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 36px;
-            font-weight: 900;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .welcome-subtitle {
-            font-size: 15px;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        /* Answer Group Selection */
-        .answer-group-item {
-            background: var(--bg-secondary);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            margin: 8px 0;
-            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,217,255,0.4);
+            z-index: 1000;
             transition: all 0.3s ease;
         }
+        .scroll-to-bottom.show { display: flex; }
+        .scroll-to-bottom:hover { transform: scale(1.1); }
 
-        .answer-group-item:hover {
-            border-color: var(--accent-cyan);
-            transform: translateX(4px);
-        }
-
-        .answer-group-item.selected {
-            border-color: var(--accent-cyan);
-            background: var(--bg-tertiary);
-        }
-
-        .answer-group-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-            font-size: 11px;
-        }
-
-        .answer-preview-tag {
-            background: var(--bg-primary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            color: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .app-title {
-                font-size: 22px;
-            }
-
-            .message-bubble {
-                font-size: 13px;
-            }
-
-            .btn {
-                padding: 9px 14px;
-                font-size: 12px;
-            }
-        }
-
-        /* Scrollbar */
-        .chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-cyan);
-        }
-
-        /* Settings Modal - Back Office */
+        /* ===== SETTINGS OVERLAY ===== */
         .settings-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 14, 39, 0.95);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10,14,39,0.95);
             backdrop-filter: blur(10px);
             z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease-out;
         }
-
-        .settings-overlay.show {
-            display: flex;
-        }
+        .settings-overlay.show { display: flex; }
 
         .settings-panel {
-            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
             border: 2px solid var(--accent-cyan);
             border-radius: 20px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 85vh;
+            width: 92%;
+            max-width: 720px;
+            max-height: 88vh;
             overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
-            animation: slideUp 0.4s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            box-shadow: 0 20px 60px rgba(0,217,255,0.3);
         }
 
         .settings-header {
-            position: sticky;
-            top: 0;
+            position: sticky; top: 0;
             background: var(--bg-primary);
-            padding: 20px;
+            padding: 18px 20px;
             border-bottom: 2px solid var(--accent-cyan);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             z-index: 10;
         }
-
         .settings-title {
             font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            font-weight: 900;
+            font-size: 22px; font-weight: 900;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
         .close-settings-btn {
-            width: 36px;
-            height: 36px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             background: var(--bg-tertiary);
             border: 2px solid var(--border);
             color: var(--text-primary);
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease;
         }
+        .close-settings-btn:hover { border-color: var(--danger); color: var(--danger); transform: rotate(90deg); }
 
-        .close-settings-btn:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-            transform: rotate(90deg);
-        }
-
-        .settings-content {
-            padding: 20px;
-        }
-
-        .settings-section {
-            margin-bottom: 30px;
-        }
-
+        .settings-content { padding: 20px; }
+        .settings-section { margin-bottom: 28px; }
         .settings-section-title {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 16px; font-weight: 700;
             color: var(--accent-cyan);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
         }
 
+        /* ===== SETTINGS TABS ===== */
+        .settings-tabs {
+            display: flex; gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .settings-tab {
+            flex: 1;
+            padding: 12px 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .settings-tab.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+        .settings-tab:hover { color: var(--accent-cyan); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== CONFIG ITEMS ===== */
         .config-list {
             background: var(--bg-primary);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
-
         .config-item {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             transition: all 0.3s ease;
         }
-
-        .config-item:hover {
-            border-color: var(--accent-cyan);
-            transform: translateX(4px);
-        }
-
-        .config-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .config-item-content {
-            flex: 1;
-        }
-
-        .config-item-text {
-            font-size: 14px;
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .config-item-meta {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .config-item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .icon-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .icon-btn.edit:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-        }
-
-        .icon-btn.delete:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
+        .config-item:hover { border-color: var(--accent-cyan); }
+        .config-item:last-child { margin-bottom: 0; }
+        .config-item-content { flex: 1; }
+        .config-item-text { font-size: 14px; color: var(--text-primary); font-weight: 700; }
+        .config-item-meta { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+        .config-item-actions { display: flex; gap: 6px; align-items: center; }
 
         .add-btn {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             border: 2px dashed var(--border);
             border-radius: 10px;
             background: transparent;
             color: var(--text-secondary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px; font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        .add-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: var(--bg-tertiary); }
 
-        .add-btn:hover {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            background: var(--bg-tertiary);
-        }
-
-        .import-export-btns {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .settings-btn {
-            flex: 1;
+        /* ===== CUSTOM ANSWER GROUP ===== */
+        .answer-group-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 14px;
-            border-radius: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
+        }
+        .answer-group-card:hover { border-color: var(--accent-cyan); }
+        .answer-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .answer-group-name { font-size: 14px; font-weight: 700; color: var(--accent-cyan); }
+        .answer-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .answer-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 4px;
         }
+        .answer-tag.buy { border-color: var(--success); color: var(--success); }
+        .answer-tag.sell { border-color: var(--danger); color: var(--danger); }
+        .answer-tag.standby { border-color: var(--warning); color: var(--warning); }
 
-        .settings-btn.import {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--accent-purple);
-            color: var(--accent-purple);
+        /* ===== IMPORT/EXPORT ===== */
+        .import-export-btns { display: flex; gap: 12px; margin-top: 12px; }
+        .settings-btn {
+            flex: 1;
+            padding: 13px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
-        .settings-btn.import:hover {
-            background: var(--accent-purple);
-            color: var(--text-primary);
-            transform: translateY(-2px);
-        }
-
-        .settings-btn.export {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-        }
-
-        .settings-btn.export:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-primary);
-            transform: translateY(-2px);
-        }
+        .settings-btn.import { background: var(--bg-tertiary); border: 2px solid var(--accent-purple); color: var(--accent-purple); }
+        .settings-btn.import:hover { background: var(--accent-purple); color: var(--text-primary); transform: translateY(-2px); }
+        .settings-btn.export { background: var(--bg-tertiary); border: 2px solid var(--accent-cyan); color: var(--accent-cyan); }
+        .settings-btn.export:hover { background: var(--accent-cyan); color: var(--bg-primary); transform: translateY(-2px); }
+        .settings-btn.danger { background: var(--bg-tertiary); border: 2px solid var(--danger); color: var(--danger); }
+        .settings-btn.danger:hover { background: var(--danger); color: var(--text-primary); transform: translateY(-2px); }
 
         .save-settings-btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             border: none;
             border-radius: 12px;
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 15px; font-weight: 700;
             cursor: pointer;
             margin-top: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0,217,255,0.3);
         }
+        .save-settings-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,217,255,0.5); }
 
-        .save-settings-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(0, 217, 255, 0.5);
-        }
-
-        /* Edit Form Modal */
+        /* ===== EDIT MODAL ===== */
         .edit-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
-
-        .edit-modal.show {
-            display: flex;
-        }
+        .edit-modal.show { display: flex; }
 
         .edit-form {
             background: var(--bg-secondary);
             border: 2px solid var(--accent-cyan);
             border-radius: 16px;
             padding: 24px;
-            width: 90%;
-            max-width: 500px;
-        }
-
-        .edit-form-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .form-input {
             width: 100%;
-            padding: 12px;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .edit-form-title { font-size: 18px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 18px; }
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 7px; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 11px 14px;
             border: 2px solid var(--border);
             border-radius: 10px;
             background: var(--bg-primary);
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             transition: all 0.3s ease;
         }
-
-        .form-input:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            outline: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-select:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
+        .form-input:focus, .form-select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(0,217,255,0.1); }
+        .form-hint { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
         .form-btn {
-            flex: 1;
-            padding: 12px;
+            flex: 1; padding: 11px;
             border-radius: 10px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px; font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        .form-btn.cancel { background: var(--bg-tertiary); border: 2px solid var(--border); color: var(--text-secondary); }
+        .form-btn.cancel:hover { border-color: var(--danger); color: var(--danger); }
+        .form-btn.save { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); border: none; color: var(--text-primary); }
+        .form-btn.save:hover { transform: translateY(-2px); }
 
-        .form-btn.cancel {
-            background: var(--bg-tertiary);
-            border: 2px solid var(--border);
-            color: var(--text-secondary);
+        /* Answer builder in edit form */
+        .answer-builder { display: flex; flex-direction: column; gap: 8px; }
+        .answer-builder-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
         }
-
-        .form-btn.cancel:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .form-btn.save {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border: none;
+        .answer-builder-row input {
+            flex: 1;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--bg-secondary);
             color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
         }
-
-        .form-btn.save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.4);
-        }
-
-        /* Hidden file input */
-        #importFileInput {
-            display: none;
-        }
-
-        /* Scroll to Bottom Button - WhatsApp Style */
-        .scroll-to-bottom {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            border: none;
-            color: white;
-            font-size: 24px;
+        .answer-builder-row input:focus { border-color: var(--accent-cyan); }
+        .answer-color-select {
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            outline: none;
             cursor: pointer;
+        }
+        .answer-remove-btn {
+            width: 26px; height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .answer-remove-btn:hover { border-color: var(--danger); background: rgba(255,71,87,0.1); }
+        .add-answer-row-btn {
+            padding: 8px;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .add-answer-row-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+        /* ===== SESSION HISTORY PANEL ===== */
+        .history-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10,14,39,0.96);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.4);
-            z-index: 1000;
+        }
+        .history-overlay.show { display: flex; }
+
+        .history-panel {
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+            border: 2px solid var(--accent-purple);
+            border-radius: 20px;
+            width: 92%;
+            max-width: 720px;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(123,97,255,0.3);
+        }
+        .history-header {
+            position: sticky; top: 0;
+            background: var(--bg-primary);
+            padding: 18px 20px;
+            border-bottom: 2px solid var(--accent-purple);
+            display: flex; align-items: center; justify-content: space-between;
+            z-index: 10;
+        }
+        .history-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px; font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .close-history-btn {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.3s ease;
-            animation: bounceIn 0.5s ease-out;
         }
+        .close-history-btn:hover { border-color: var(--danger); color: var(--danger); transform: rotate(90deg); }
 
-        .scroll-to-bottom.show {
-            display: flex;
-        }
+        .history-content { padding: 20px; }
+        .history-empty { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 14px; }
 
-        .scroll-to-bottom:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(0, 217, 255, 0.6);
+        .history-session-detail {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
         }
+        .history-session-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .history-session-time { font-size: 13px; color: var(--accent-cyan); font-weight: 700; }
+        .history-session-actions { display: flex; gap: 8px; }
+        .session-view-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-purple);
+            background: transparent;
+            color: var(--accent-purple);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .session-view-btn:hover { background: var(--accent-purple); color: var(--text-primary); }
+        .session-delete-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .session-delete-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-        .scroll-to-bottom:active {
-            transform: scale(0.95);
+        .history-answers-grid {
+            display: grid;
+            grid-template-columns: auto repeat(var(--num-cols), 1fr);
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 12px;
         }
+        .grid-header {
+            background: var(--bg-tertiary);
+            padding: 8px 10px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-size: 11px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        .grid-cell {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            font-size: 12px;
+            color: var(--text-secondary);
+            word-break: break-word;
+        }
+        .grid-cell.pair-cell {
+            font-weight: 700;
+            color: var(--text-primary);
+            background: rgba(0,217,255,0.04);
+        }
+        .grid-cell.buy-cell { color: var(--success); }
+        .grid-cell.sell-cell { color: var(--danger); }
+        .grid-cell.standby-cell { color: var(--warning); }
 
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) translateY(20px);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
+        #importFileInput { display: none; }
 
         @media (max-width: 480px) {
-            .scroll-to-bottom {
-                right: 20px;
-                bottom: 90px;
-            }
+            .app-title { font-size: 20px; }
+            .message-bubble { font-size: 13px; }
+            .btn { padding: 9px 12px; font-size: 12px; }
+            .scroll-to-bottom { right: 16px; bottom: 86px; }
         }
+
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-track { background: transparent; }
+        .chat-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .chat-container::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+        .settings-panel::-webkit-scrollbar { width: 5px; }
+        .settings-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .history-panel::-webkit-scrollbar { width: 5px; }
+        .history-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <div class="app-header">
-            <div class="header-content">
-                <button class="back-btn" id="backBtn">← Back</button>
-                <div class="app-title">Trading Partner</div>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <button class="icon-btn" id="settingsBtn" style="width: 40px; height: 40px; font-size: 20px;" title="Settings">
-                        ⚙️
-                    </button>
-                    <div class="status-indicator"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Container -->
-        <div class="chat-container" id="chatContainer">
-            <!-- Messages will be inserted here -->
-            <!-- Invisible anchor element - defines true bottom -->
-            <div class="scroll-anchor" id="scrollAnchor"></div>
-        </div>
-
-        <!-- Scroll to Bottom Button -->
-        <button class="scroll-to-bottom" id="scrollToBottomBtn">
-            ⬇
-        </button>
-
-        <!-- Input Container -->
-        <div class="input-container" id="inputContainer" style="display: none;">
-            <div class="input-wrapper">
-                <textarea 
-                    class="input-field" 
-                    id="messageInput" 
-                    placeholder="Type your answer..."
-                    rows="1"
-                ></textarea>
-                <button class="send-btn" id="sendBtn">
-                    ➤
-                </button>
+<div class="app-container">
+    <!-- Header -->
+    <div class="app-header">
+        <div class="header-content">
+            <button class="back-btn" id="backBtn">← Back</button>
+            <div class="app-title">Trading Partner</div>
+            <div class="header-actions">
+                <button class="icon-btn" id="historyBtn" style="font-size:18px;" title="Session History">📋</button>
+                <button class="icon-btn" id="settingsBtn" style="font-size:18px;" title="Settings">⚙️</button>
+                <div class="status-indicator"></div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="settings-overlay" id="settingsOverlay">
-        <div class="settings-panel">
-            <div class="settings-header">
-                <div class="settings-title">⚙️ Configuration</div>
-                <button class="close-settings-btn" id="closeSettingsBtn">✕</button>
+    <!-- Chat -->
+    <div class="chat-container" id="chatContainer">
+        <div class="scroll-anchor" id="scrollAnchor"></div>
+    </div>
+
+    <button class="scroll-to-bottom" id="scrollToBottomBtn">⬇</button>
+
+    <div class="input-container" id="inputContainer" style="display:none;">
+        <div class="input-wrapper">
+            <textarea class="input-field" id="messageInput" placeholder="Type your answer..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">➤</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-panel">
+        <div class="settings-header">
+            <div class="settings-title">⚙️ Configuration</div>
+            <button class="close-settings-btn" id="closeSettingsBtn">✕</button>
+        </div>
+        <div class="settings-content">
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="pairs">📊 Pairs</button>
+                <button class="settings-tab" data-tab="questions">📝 Questions</button>
+                <button class="settings-tab" data-tab="answers">🎯 Answer Groups</button>
+                <button class="settings-tab" data-tab="data">💾 Data</button>
             </div>
-            
-            <div class="settings-content">
-                <!-- Pairs Section -->
+
+            <!-- PAIRS TAB -->
+            <div class="tab-content active" id="tab-pairs">
                 <div class="settings-section">
-                    <div class="settings-section-title">
-                        📊 Trading Pairs
-                    </div>
-                    <div class="config-list" id="pairsList">
-                        <!-- Pairs will be inserted here -->
-                    </div>
+                    <div class="settings-section-title">📊 Trading Pairs</div>
+                    <div class="config-list" id="pairsList"></div>
                     <button class="add-btn" id="addPairBtn">+ Add Pair</button>
                 </div>
+            </div>
 
-                <!-- Questions Section -->
+            <!-- QUESTIONS TAB -->
+            <div class="tab-content" id="tab-questions">
                 <div class="settings-section">
-                    <div class="settings-section-title">
-                        📝 Questions
-                    </div>
-                    <div class="config-list" id="questionsList">
-                        <!-- Questions will be inserted here -->
-                    </div>
+                    <div class="settings-section-title">📝 Questions</div>
+                    <div class="config-list" id="questionsList"></div>
                     <button class="add-btn" id="addQuestionBtn">+ Add Question</button>
                 </div>
+            </div>
 
-                <!-- Import/Export Section -->
+            <!-- ANSWER GROUPS TAB -->
+            <div class="tab-content" id="tab-answers">
                 <div class="settings-section">
-                    <div class="settings-section-title">
-                        💾 Import / Export
+                    <div class="settings-section-title">🎯 Custom Answer Groups</div>
+                    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+                        Built-in groups are read-only. Create custom groups to use your own answer options. Each answer can be tagged as Buy (green), Sell (red), Standby (yellow), or Neutral.
+                    </p>
+                    <div id="builtinGroupsList"></div>
+                    <div style="margin:16px 0;border-top:1px solid var(--border);padding-top:16px;">
+                        <div class="settings-section-title">✨ My Custom Groups</div>
+                        <div id="customGroupsList"></div>
+                        <button class="add-btn" id="addCustomGroupBtn">+ Create Custom Answer Group</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- DATA TAB -->
+            <div class="tab-content" id="tab-data">
+                <div class="settings-section">
+                    <div class="settings-section-title">💾 Import / Export</div>
                     <div class="import-export-btns">
-                        <button class="settings-btn import" id="importBtn">
-                            📥 Import Config
-                        </button>
-                        <button class="settings-btn export" id="exportBtn">
-                            📤 Export Config
-                        </button>
+                        <button class="settings-btn import" id="importBtn">📥 Import Config</button>
+                        <button class="settings-btn export" id="exportBtn">📤 Export Config</button>
                     </div>
                     <input type="file" id="importFileInput" accept=".json">
                 </div>
-
-                <!-- Save Button -->
-                <button class="save-settings-btn" id="saveSettingsBtn">
-                    💾 Save & Close
-                </button>
+                <div class="settings-section">
+                    <div class="settings-section-title">🗑️ Session Data</div>
+                    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
+                        Sessions are automatically saved. You can clear all history below.
+                    </p>
+                    <button class="settings-btn danger" id="clearSessionsBtn" style="width:100%;">🗑️ Clear All Session History</button>
+                </div>
             </div>
+
+            <button class="save-settings-btn" id="saveSettingsBtn">💾 Save & Close</button>
         </div>
     </div>
+</div>
 
-    <!-- Edit Modal -->
-    <div class="edit-modal" id="editModal">
-        <div class="edit-form" id="editForm">
-            <!-- Form content will be dynamically generated -->
+<!-- ===== HISTORY MODAL ===== -->
+<div class="history-overlay" id="historyOverlay">
+    <div class="history-panel">
+        <div class="history-header">
+            <div class="history-title">📋 Session History</div>
+            <button class="close-history-btn" id="closeHistoryBtn">✕</button>
         </div>
+        <div class="history-content" id="historyContent"></div>
     </div>
+</div>
 
-    <script>
-        // ============================================
-        // PREDEFINED ANSWER GROUPS
-        // ============================================
-        const ANSWER_GROUPS = {
-            bias: {
-                name: 'Market Bias',
-                answers: [
-                    { text: '📈 Bullish', class: 'buy' },
-                    { text: '📉 Bearish', class: 'sell' },
-                    { text: '↔️ Sideways', class: 'standby' }
-                ]
-            },
-            momentum: {
-                name: 'Momentum',
-                answers: [
-                    { text: '🔥 Bullish Strong', class: 'buy' },
-                    { text: '📈 Bullish', class: 'buy' },
-                    { text: '🌅 Bullish Building', class: 'buy' },
-                    { text: '🌤️ Bullish Fading', class: 'standby' },
-                    { text: '⚡ Bullish Shifting', class: 'standby' },
-                    { text: '🔄 Bullish Exhausted', class: 'standby' },
-                    { text: '❄️ Bearish Strong', class: 'sell' },
-                    { text: '📉 Bearish', class: 'sell' },
-                    { text: '🌑 Bearish Building', class: 'sell' },
-                    { text: '🌥️ Bearish Fading', class: 'standby' },
-                    { text: '⚡ Bearish Shifting', class: 'standby' },
-                    { text: '🔄 Bearish Exhausted', class: 'standby' }
-                ]
-            },
-            flow: {
-                name: 'Order Flow',
-                answers: [
-                    { text: '⬆️ Up', class: 'buy' },
-                    { text: '⬇️ Down', class: 'sell' },
-                    { text: '➡️ Mixed', class: 'standby' },
-                    { text: '🔥 Strong Up', class: 'buy' },
-                    { text: '❄️ Weak Down', class: 'sell' }
-                ]
-            },
-            structure: {
-                name: 'Market Structure',
-                answers: [
-                    { text: '📊 HL/HH', class: 'buy' },
-                    { text: '📉 LH/LL', class: 'sell' },
-                    { text: '🔄 Choppy', class: 'standby' },
-                    { text: '💥 Break', class: '' },
-                    { text: '🎯 Retest', class: '' },
-                    { text: '📍 Support', class: '' },
-                    { text: '🚧 Resistance', class: '' }
-                ]
-            },
-            verdict: {
-                name: 'Trading Decision',
-                answers: [
-                    { text: '▲ Buy', class: 'buy' },
-                    { text: '▼ Sell', class: 'sell' },
-                    { text: '🔄 Buy to Sell', class: 'standby' },
-                    { text: '🔄 Sell to Buy', class: 'standby' },
-                    { text: '⏸ Stand by for Buys', class: 'standby' },
-                    { text: '⏸ Stand by for Sells', class: 'standby' }
-                ]
-            },
-            strength: {
-                name: 'Trend Strength',
-                answers: [
-                    { text: '💪 Very Strong', class: 'buy' },
-                    { text: '👍 Strong', class: 'buy' },
-                    { text: '🤷 Moderate', class: 'standby' },
-                    { text: '👎 Weak', class: 'sell' },
-                    { text: '💀 Very Weak', class: 'sell' }
-                ]
-            },
-            timeframe: {
-                name: 'Timeframe Alignment',
-                answers: [
-                    { text: '✅ Aligned', class: 'buy' },
-                    { text: '⚠️ Partial', class: 'standby' },
-                    { text: '❌ Conflict', class: 'sell' }
-                ]
-            },
-            liquidity: {
-                name: 'Liquidity',
-                answers: [
-                    { text: '💧 Equal Highs', class: '' },
-                    { text: '🌊 Equal Lows', class: '' },
-                    { text: '🎯 Sweep', class: '' },
-                    { text: '📊 Pool Above', class: '' },
-                    { text: '📉 Pool Below', class: '' }
-                ]
-            },
-            volume: {
-                name: 'Volume Profile',
-                answers: [
-                    { text: '📈 High Volume', class: 'buy' },
-                    { text: '📉 Low Volume', class: 'sell' },
-                    { text: '📊 Average', class: 'standby' },
-                    { text: '🔥 Climax', class: '' }
-                ]
+<!-- ===== EDIT MODAL ===== -->
+<div class="edit-modal" id="editModal">
+    <div class="edit-form" id="editForm"></div>
+</div>
+
+<script>
+// ============================================
+// BUILT-IN ANSWER GROUPS (read-only)
+// ============================================
+const BUILTIN_GROUPS = {
+    bias: {
+        name: 'Market Bias',
+        answers: [
+            { text: '📈 Bullish', class: 'buy' },
+            { text: '📉 Bearish', class: 'sell' },
+            { text: '↔️ Sideways', class: 'standby' }
+        ]
+    },
+    momentum: {
+        name: 'Momentum',
+        answers: [
+            { text: '🔥 Bullish Strong', class: 'buy' },
+            { text: '📈 Bullish', class: 'buy' },
+            { text: '🌅 Bullish Building', class: 'buy' },
+            { text: '🌤️ Bullish Fading', class: 'standby' },
+            { text: '⚡ Bullish Shifting', class: 'standby' },
+            { text: '🔄 Bullish Exhausted', class: 'standby' },
+            { text: '❄️ Bearish Strong', class: 'sell' },
+            { text: '📉 Bearish', class: 'sell' },
+            { text: '🌑 Bearish Building', class: 'sell' },
+            { text: '🌥️ Bearish Fading', class: 'standby' },
+            { text: '⚡ Bearish Shifting', class: 'standby' },
+            { text: '🔄 Bearish Exhausted', class: 'standby' }
+        ]
+    },
+    flow: {
+        name: 'Order Flow',
+        answers: [
+            { text: '⬆️ Up', class: 'buy' },
+            { text: '⬇️ Down', class: 'sell' },
+            { text: '➡️ Mixed', class: 'standby' },
+            { text: '🔥 Strong Up', class: 'buy' },
+            { text: '❄️ Weak Down', class: 'sell' }
+        ]
+    },
+    structure: {
+        name: 'Market Structure',
+        answers: [
+            { text: '📊 HL/HH', class: 'buy' },
+            { text: '📉 LH/LL', class: 'sell' },
+            { text: '🔄 Choppy', class: 'standby' },
+            { text: '💥 Break', class: '' },
+            { text: '🎯 Retest', class: '' },
+            { text: '📍 Support', class: '' },
+            { text: '🚧 Resistance', class: '' }
+        ]
+    },
+    verdict: {
+        name: 'Trading Decision',
+        answers: [
+            { text: '▲ Buy', class: 'buy' },
+            { text: '▼ Sell', class: 'sell' },
+            { text: '🔄 Buy to Sell', class: 'standby' },
+            { text: '🔄 Sell to Buy', class: 'standby' },
+            { text: '⏸ Stand by for Buys', class: 'standby' },
+            { text: '⏸ Stand by for Sells', class: 'standby' }
+        ]
+    },
+    strength: {
+        name: 'Trend Strength',
+        answers: [
+            { text: '💪 Very Strong', class: 'buy' },
+            { text: '👍 Strong', class: 'buy' },
+            { text: '🤷 Moderate', class: 'standby' },
+            { text: '👎 Weak', class: 'sell' },
+            { text: '💀 Very Weak', class: 'sell' }
+        ]
+    },
+    timeframe: {
+        name: 'Timeframe Alignment',
+        answers: [
+            { text: '✅ Aligned', class: 'buy' },
+            { text: '⚠️ Partial', class: 'standby' },
+            { text: '❌ Conflict', class: 'sell' }
+        ]
+    },
+    liquidity: {
+        name: 'Liquidity',
+        answers: [
+            { text: '💧 Equal Highs', class: '' },
+            { text: '🌊 Equal Lows', class: '' },
+            { text: '🎯 Sweep', class: '' },
+            { text: '📊 Pool Above', class: '' },
+            { text: '📉 Pool Below', class: '' }
+        ]
+    },
+    volume: {
+        name: 'Volume Profile',
+        answers: [
+            { text: '📈 High Volume', class: 'buy' },
+            { text: '📉 Low Volume', class: 'sell' },
+            { text: '📊 Average', class: 'standby' },
+            { text: '🔥 Climax', class: '' }
+        ]
+    }
+};
+
+// ============================================
+// STORAGE KEYS
+// ============================================
+const STORAGE_KEYS = {
+    CONFIG: 'tradingPartner_config',
+    SESSIONS: 'tradingPartner_sessions',
+    CUSTOM_GROUPS: 'tradingPartner_customGroups'
+};
+
+// ============================================
+// STATE
+// ============================================
+const state = {
+    phase: 'welcome',
+    pairs: [],
+    questions: [],
+    questionGroups: {},
+    customGroups: {},     // user-created answer groups
+    currentPairIndex: 0,
+    currentQuestionIndex: 0,
+    answers: {},
+    timestamp: '',
+    setupStep: 'pairs',
+    questionCount: 0,
+    currentQuestionSetup: 0,
+    answerHistory: [],
+    sessions: []          // all saved sessions
+};
+
+// Get ALL available groups (builtin + custom)
+function getAllGroups() {
+    const custom = loadCustomGroups();
+    return { ...BUILTIN_GROUPS, ...custom };
+}
+
+// ============================================
+// PERSISTENCE
+// ============================================
+function loadCustomGroups() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_GROUPS);
+        return saved ? JSON.parse(saved) : {};
+    } catch(e) { return {}; }
+}
+
+function saveCustomGroups(groups) {
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_GROUPS, JSON.stringify(groups));
+}
+
+function loadConfig() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.CONFIG);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            state.pairs = parsed.pairs || [];
+            state.questions = parsed.questions || [];
+            state.questionGroups = parsed.questionGroups || {};
+            state.customGroups = loadCustomGroups();
+            if (state.pairs.length && state.questions.length) {
+                state.phase = 'welcome-back';
             }
-        };
-
-        // ============================================
-        // STATE MANAGEMENT
-        // ============================================
-        const state = {
-            phase: 'welcome',
-            pairs: [],
-            questions: [],
-            questionGroups: {}, // Maps question index to answer group key
-            currentPairIndex: 0,
-            currentQuestionIndex: 0,
-            answers: {},
-            timestamp: '',
-            setupStep: 'pairs', // 'pairs', 'question-count', 'questions', 'groups'
-            answerHistory: [] // Track answers for back functionality
-        };
-
-        const backBtn = document.getElementById('backBtn');
-
-        // Load state from localStorage
-        function loadState() {
-            const saved = localStorage.getItem('tradingPartnerState');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                state.pairs = parsed.pairs || [];
-                state.questions = parsed.questions || [];
-                state.questionGroups = parsed.questionGroups || {};
-                
-                if (state.pairs.length && state.questions.length) {
-                    state.phase = 'welcome-back';
-                }
-            }
         }
+    } catch(e) {}
+}
 
-        // Save state to localStorage
-        function saveState() {
-            localStorage.setItem('tradingPartnerState', JSON.stringify({
-                pairs: state.pairs,
-                questions: state.questions,
-                questionGroups: state.questionGroups
-            }));
-        }
+function saveConfig() {
+    localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify({
+        pairs: state.pairs,
+        questions: state.questions,
+        questionGroups: state.questionGroups
+    }));
+}
 
-        // ============================================
-        // BACK OFFICE - SETTINGS PANEL
-        // ============================================
-        
-        const settingsOverlay = document.getElementById('settingsOverlay');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const pairsList = document.getElementById('pairsList');
-        const questionsList = document.getElementById('questionsList');
-        const addPairBtn = document.getElementById('addPairBtn');
-        const addQuestionBtn = document.getElementById('addQuestionBtn');
-        const importBtn = document.getElementById('importBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const importFileInput = document.getElementById('importFileInput');
-        const editModal = document.getElementById('editModal');
-        const editForm = document.getElementById('editForm');
+function loadSessions() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.SESSIONS);
+        return saved ? JSON.parse(saved) : [];
+    } catch(e) { return []; }
+}
 
-        // Temporary state for editing
-        let tempPairs = [];
-        let tempQuestions = [];
-        let tempQuestionGroups = {};
+function saveSession(sessionData) {
+    const sessions = loadSessions();
+    sessions.unshift(sessionData); // newest first
+    // Keep max 100 sessions
+    if (sessions.length > 100) sessions.splice(100);
+    localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
+}
 
-        // Open settings
-        settingsBtn.addEventListener('click', openSettings);
-        
-        function openSettings() {
-            // Copy current state to temp
-            tempPairs = [...state.pairs];
-            tempQuestions = [...state.questions];
-            tempQuestionGroups = {...state.questionGroups};
-            
-            // Render settings
-            renderSettings();
-            
-            // Show modal
-            settingsOverlay.classList.add('show');
-        }
+function deleteSession(index) {
+    const sessions = loadSessions();
+    sessions.splice(index, 1);
+    localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
+}
 
-        // Close settings
-        closeSettingsBtn.addEventListener('click', closeSettings);
-        
-        function closeSettings() {
-            settingsOverlay.classList.remove('show');
-        }
+function clearAllSessions() {
+    localStorage.removeItem(STORAGE_KEYS.SESSIONS);
+}
 
-        // Save settings
-        saveSettingsBtn.addEventListener('click', saveSettings);
-        
-        function saveSettings() {
-            // Validate
-            if (tempPairs.length === 0) {
-                alert('⚠️ Please add at least one trading pair');
-                return;
-            }
-            
-            if (tempQuestions.length === 0) {
-                alert('⚠️ Please add at least one question');
-                return;
-            }
-            
-            // Apply changes
-            state.pairs = tempPairs;
-            state.questions = tempQuestions;
-            state.questionGroups = tempQuestionGroups;
-            
-            // Save to localStorage
-            saveState();
-            
-            // Update phase
-            state.phase = 'welcome-back';
-            
-            // Close settings
-            closeSettings();
-            
-            // Show success message
-            addMessage('✅ Configuration saved successfully!', true);
-            
-            // Refresh welcome screen
-            showWelcome();
-        }
+// ============================================
+// DOM REFS
+// ============================================
+const chatContainer = document.getElementById('chatContainer');
+const inputContainer = document.getElementById('inputContainer');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const backBtn = document.getElementById('backBtn');
+const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const historyOverlay = document.getElementById('historyOverlay');
+const editModal = document.getElementById('editModal');
+const editForm = document.getElementById('editForm');
 
-        // Render settings
-        function renderSettings() {
-            renderPairs();
-            renderQuestions();
-        }
+// ============================================
+// UI HELPERS
+// ============================================
+function addMessage(text, isBot = true, buttons = null) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isBot ? 'message message-bot' : 'message message-user';
 
-        // Render pairs list
-        function renderPairs() {
-            pairsList.innerHTML = '';
-            
-            if (tempPairs.length === 0) {
-                pairsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 20px;">No pairs configured</div>';
-                return;
-            }
-            
-            tempPairs.forEach((pair, index) => {
-                const item = document.createElement('div');
-                item.className = 'config-item';
-                item.innerHTML = `
-                    <div class="config-item-content">
-                        <div class="config-item-text">${pair}</div>
-                    </div>
-                    <div class="config-item-actions">
-                        ${index > 0 ? '<button class="icon-btn" onclick="movePairUp(' + index + ')" title="Move up">↑</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↑</button>'}
-                        ${index < tempPairs.length - 1 ? '<button class="icon-btn" onclick="movePairDown(' + index + ')" title="Move down">↓</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↓</button>'}
-                        <button class="icon-btn edit" onclick="editPair(${index})">✏️</button>
-                        <button class="icon-btn delete" onclick="deletePair(${index})">🗑️</button>
-                    </div>
-                `;
-                pairsList.appendChild(item);
-            });
-        }
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
 
-        // Render questions list
-        function renderQuestions() {
-            questionsList.innerHTML = '';
-            
-            if (tempQuestions.length === 0) {
-                questionsList.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 20px;">No questions configured</div>';
-                return;
-            }
-            
-            tempQuestions.forEach((question, index) => {
-                const groupKey = tempQuestionGroups[index];
-                const groupName = groupKey && ANSWER_GROUPS[groupKey] ? ANSWER_GROUPS[groupKey].name : 'Not set';
-                
-                const item = document.createElement('div');
-                item.className = 'config-item';
-                item.innerHTML = `
-                    <div class="config-item-content">
-                        <div class="config-item-text">${index + 1}. ${question}</div>
-                        <div class="config-item-meta">Answer Group: ${groupName}</div>
-                    </div>
-                    <div class="config-item-actions">
-                        ${index > 0 ? '<button class="icon-btn" onclick="moveQuestionUp(' + index + ')" title="Move up">↑</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↑</button>'}
-                        ${index < tempQuestions.length - 1 ? '<button class="icon-btn" onclick="moveQuestionDown(' + index + ')" title="Move down">↓</button>' : '<button class="icon-btn" style="opacity: 0.3; cursor: not-allowed;" disabled>↓</button>'}
-                        <button class="icon-btn edit" onclick="editQuestion(${index})">✏️</button>
-                        <button class="icon-btn delete" onclick="deleteQuestion(${index})">🗑️</button>
-                    </div>
-                `;
-                questionsList.appendChild(item);
-            });
-        }
+    const label = document.createElement('div');
+    label.className = 'message-label';
+    label.textContent = isBot ? 'Trading Partner' : 'You';
 
-        // Add pair
-        addPairBtn.addEventListener('click', () => {
-            showEditForm('pair', -1, '');
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+    contentDiv.appendChild(label);
+    contentDiv.appendChild(bubble);
+
+    if (buttons) {
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'button-group';
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.className = `btn ${btn.class || 'btn-primary'}`;
+            button.textContent = btn.text;
+            button.onclick = btn.action;
+            btnGroup.appendChild(button);
         });
+        contentDiv.appendChild(btnGroup);
+    }
 
-        // Move pair up
-        window.movePairUp = function(index) {
-            if (index > 0) {
-                const temp = tempPairs[index];
-                tempPairs[index] = tempPairs[index - 1];
-                tempPairs[index - 1] = temp;
-                renderPairs();
-            }
-        };
+    messageDiv.appendChild(contentDiv);
+    const anchor = document.getElementById('scrollAnchor');
+    chatContainer.insertBefore(messageDiv, anchor);
+    scrollToAnchor();
+}
 
-        // Move pair down
-        window.movePairDown = function(index) {
-            if (index < tempPairs.length - 1) {
-                const temp = tempPairs[index];
-                tempPairs[index] = tempPairs[index + 1];
-                tempPairs[index + 1] = temp;
-                renderPairs();
-            }
-        };
+function showLoading() {
+    const div = document.createElement('div');
+    div.className = 'message message-bot';
+    div.id = 'loading';
+    div.innerHTML = `<div class="message-content"><div class="message-label">Trading Partner</div><div class="message-bubble"><div class="loading"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div></div>`;
+    const anchor = document.getElementById('scrollAnchor');
+    chatContainer.insertBefore(div, anchor);
+    scrollToAnchor();
+}
 
-        // Add question
-        addQuestionBtn.addEventListener('click', () => {
-            showEditForm('question', -1, '', 'bias');
+function hideLoading() {
+    const l = document.getElementById('loading');
+    if (l) l.remove();
+}
+
+function showInput(placeholder = 'Type your answer...') {
+    inputContainer.style.display = 'block';
+    messageInput.placeholder = placeholder;
+    messageInput.focus();
+}
+
+function hideInput() {
+    inputContainer.style.display = 'none';
+    messageInput.value = '';
+}
+
+function clearChat() {
+    chatContainer.innerHTML = '';
+    const anchor = document.createElement('div');
+    anchor.className = 'scroll-anchor';
+    anchor.id = 'scrollAnchor';
+    chatContainer.appendChild(anchor);
+}
+
+function isUserAtBottom() {
+    return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) < 150;
+}
+
+function scrollToAnchor() {
+    const anchor = document.getElementById('scrollAnchor');
+    if (isUserAtBottom()) {
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+        scrollToBottomBtn.classList.add('show');
+    }
+}
+
+function forceScrollToAnchor() {
+    const anchor = document.getElementById('scrollAnchor');
+    anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    scrollToBottomBtn.classList.remove('show');
+}
+
+scrollToBottomBtn.addEventListener('click', () => {
+    document.getElementById('scrollAnchor').scrollIntoView({ behavior: 'smooth', block: 'end' });
+    scrollToBottomBtn.classList.remove('show');
+});
+
+chatContainer.addEventListener('scroll', () => {
+    if (isUserAtBottom()) scrollToBottomBtn.classList.remove('show');
+});
+
+// ============================================
+// WELCOME / SETUP
+// ============================================
+function showWelcome() {
+    clearChat();
+    if (state.phase === 'welcome-back') {
+        addMessage(
+            `Welcome back! 💙\n\nPairs: ${state.pairs.join(', ')}\n\nReady to start your session?`,
+            true,
+            [
+                { text: '▶ Start Session', class: 'btn-primary', action: startSession },
+                { text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup }
+            ]
+        );
+    } else {
+        chatContainer.innerHTML = `
+            <div class="welcome-screen">
+                <span class="welcome-icon">💹</span>
+                <div class="welcome-title">Trading Partner</div>
+                <div class="welcome-subtitle">Your pre-trade accountability system.<br>Enforce discipline. Prevent impulsive trades.<br>Trade your plan, not your emotions.</div>
+            </div>
+        `;
+        const anchor = document.createElement('div');
+        anchor.className = 'scroll-anchor';
+        anchor.id = 'scrollAnchor';
+        chatContainer.appendChild(anchor);
+        forceScrollToAnchor();
+        setTimeout(() => {
+            addMessage(
+                "Welcome! I'm your trading accountability partner. 🎯\n\nLet's set up your custom trading framework.",
+                true,
+                [{ text: '🚀 Get Started', class: 'btn-primary', action: startSetup }]
+            );
+        }, 600);
+    }
+}
+
+function startSetup() {
+    state.pairs = [];
+    state.questions = [];
+    state.questionGroups = {};
+    state.currentQuestionSetup = 0;
+    state.questionCount = 0;
+    state.setupStep = 'pairs';
+    state.phase = 'setup';
+    addMessage("Step 1 of 3: Trading Pairs\n\nEnter your pairs separated by commas.\n\nExample: EURUSD, GBPUSD, XAUUSD, USDJPY", true);
+    showInput('Enter pairs (e.g., EURUSD, GBPUSD)');
+}
+
+function handleSetupInput(input) {
+    if (state.setupStep === 'pairs') {
+        const pairs = input.split(',').map(p => p.trim().toUpperCase()).filter(p => p.length > 0);
+        if (pairs.length === 0) { addMessage("❌ Please enter at least one trading pair.", true); return; }
+        state.pairs = pairs;
+        state.setupStep = 'question-count';
+        addMessage(`✅ Pairs configured: ${pairs.join(', ')}`, true);
+        setTimeout(() => {
+            addMessage("Step 2 of 3: Questions\n\nHow many questions per pair? (Recommended: 3-5)", true);
+            showInput('Enter number (e.g., 4)');
+        }, 400);
+    } else if (state.setupStep === 'question-count') {
+        const count = parseInt(input);
+        if (isNaN(count) || count < 1 || count > 10) { addMessage("❌ Please enter a number between 1 and 10.", true); return; }
+        state.questionCount = count;
+        state.setupStep = 'questions';
+        state.currentQuestionSetup = 0;
+        addMessage(`✅ ${count} questions per pair.`, true);
+        setTimeout(() => askForQuestion(), 400);
+    } else if (state.setupStep === 'questions') {
+        const questionText = input.trim();
+        if (!questionText) { addMessage("❌ Please enter a question.", true); return; }
+        state.questions.push(questionText);
+        state.currentQuestionSetup++;
+        if (state.currentQuestionSetup < state.questionCount) {
+            addMessage(`✅ Question ${state.currentQuestionSetup} saved!`, true);
+            setTimeout(() => askForQuestion(), 400);
+        } else {
+            state.setupStep = 'groups';
+            state.currentQuestionSetup = 0;
+            addMessage(`✅ All questions saved!`, true);
+            setTimeout(() => askForAnswerGroup(), 400);
+        }
+    }
+}
+
+function askForQuestion() {
+    const num = state.currentQuestionSetup + 1;
+    addMessage(`Question ${num} of ${state.questionCount}\n\nWhat would you like to ask?\n\nTip: Use "quotes" to set the snapshot column header`, true);
+    showInput(`Enter question ${num}...`);
+}
+
+function askForAnswerGroup() {
+    if (state.currentQuestionSetup >= state.questions.length) { finishSetup(); return; }
+    const questionText = state.questions[state.currentQuestionSetup];
+    const num = state.currentQuestionSetup + 1;
+    hideInput();
+    addMessage(`Question ${num}: "${questionText}"\n\nWhich answer group?`, true);
+    const allGroups = getAllGroups();
+    const buttons = Object.keys(allGroups).map(key => ({
+        text: `📋 ${allGroups[key].name}`,
+        class: 'btn-verdict',
+        action: () => showAnswerGroupPreview(key)
+    }));
+    addMessage('Choose one to preview its options:', true, buttons);
+}
+
+function showAnswerGroupPreview(groupKey) {
+    const allGroups = getAllGroups();
+    const group = allGroups[groupKey];
+    if (!group) return;
+    const msgs = chatContainer.querySelectorAll('.message');
+    if (msgs.length >= 1) {
+        const bg = msgs[msgs.length - 1].querySelector('.button-group');
+        if (bg) bg.style.display = 'none';
+    }
+    const preview = group.answers.map(a => a.text).join(' • ');
+    addMessage(`📋 ${group.name}\n\n${preview}\n\nUse this group?`, true, [
+        { text: '✅ Yes, use this', class: 'btn-primary', action: () => confirmAnswerGroup(groupKey) },
+        { text: '← Choose different', class: 'btn-verdict', action: () => {
+            const ms = chatContainer.querySelectorAll('.message');
+            if (ms.length >= 1) { const bg = ms[ms.length-1].querySelector('.button-group'); if (bg) bg.style.display='none'; }
+            askForAnswerGroup();
+        }}
+    ]);
+}
+
+function confirmAnswerGroup(groupKey) {
+    state.questionGroups[state.currentQuestionSetup] = groupKey;
+    const msgs = chatContainer.querySelectorAll('.message');
+    if (msgs.length >= 1) {
+        const bg = msgs[msgs.length-1].querySelector('.button-group');
+        if (bg) bg.style.display = 'none';
+    }
+    state.currentQuestionSetup++;
+    const allGroups = getAllGroups();
+    addMessage(`✅ "${allGroups[groupKey].name}" selected!`, true);
+    setTimeout(() => askForAnswerGroup(), 400);
+}
+
+function finishSetup() {
+    saveConfig();
+    state.phase = 'configured';
+    hideInput();
+    addMessage('🎉 Your framework is configured!', true);
+    setTimeout(() => {
+        const allGroups = getAllGroups();
+        let summary = `📋 Your Setup:\n\nPairs: ${state.pairs.join(', ')}\n\nQuestions:\n`;
+        state.questions.forEach((q, i) => {
+            const gk = state.questionGroups[i];
+            const gn = allGroups[gk] ? allGroups[gk].name : gk;
+            summary += `${i+1}. ${q} (${gn})\n`;
         });
+        addMessage(summary, true, [{ text: '▶ Start First Session', class: 'btn-primary', action: startSession }]);
+    }, 400);
+}
 
-        // Move question up
-        window.moveQuestionUp = function(index) {
-            if (index > 0) {
-                // Swap questions
-                const temp = tempQuestions[index];
-                tempQuestions[index] = tempQuestions[index - 1];
-                tempQuestions[index - 1] = temp;
-                
-                // Swap groups
-                const tempGroup = tempQuestionGroups[index];
-                tempQuestionGroups[index] = tempQuestionGroups[index - 1];
-                tempQuestionGroups[index - 1] = tempGroup;
-                
-                renderQuestions();
-            }
-        };
+// ============================================
+// SESSION FLOW
+// ============================================
+function startSession() {
+    state.phase = 'session';
+    state.currentPairIndex = 0;
+    state.currentQuestionIndex = 0;
+    state.answers = {};
+    state.answerHistory = [];
+    state.timestamp = new Date().toLocaleString('en-GB', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    addMessage("✅ Session started!\n\nAnswer each question thoughtfully.\n\nRemember: If you're rushing, that's your signal to pause.", true);
+    backBtn.classList.add('show');
+    forceScrollToAnchor();
+    setTimeout(() => askNextQuestion(), 700);
+}
 
-        // Move question down
-        window.moveQuestionDown = function(index) {
-            if (index < tempQuestions.length - 1) {
-                // Swap questions
-                const temp = tempQuestions[index];
-                tempQuestions[index] = tempQuestions[index + 1];
-                tempQuestions[index + 1] = temp;
-                
-                // Swap groups
-                const tempGroup = tempQuestionGroups[index];
-                tempQuestionGroups[index] = tempQuestionGroups[index + 1];
-                tempQuestionGroups[index + 1] = tempGroup;
-                
-                renderQuestions();
-            }
-        };
+function askNextQuestion() {
+    if (state.currentPairIndex >= state.pairs.length) { generateSnapshot(); return; }
+    const pair = state.pairs[state.currentPairIndex];
+    const question = state.questions[state.currentQuestionIndex];
+    const groupKey = state.questionGroups[state.currentQuestionIndex];
+    const allGroups = getAllGroups();
+    const answerGroup = allGroups[groupKey];
+    if (!state.answers[pair]) state.answers[pair] = [];
+    const buttons = answerGroup.answers.map(answer => ({
+        text: answer.text,
+        class: `btn-verdict ${answer.class}`,
+        action: () => handleAnswer(answer.text)
+    }));
+    addMessage(`💡 ${pair}\n\n${question}:`, true, buttons);
+    hideInput();
+}
 
-        // Edit pair
-        window.editPair = function(index) {
-            showEditForm('pair', index, tempPairs[index]);
-        };
-
-        // Delete pair
-        window.deletePair = function(index) {
-            if (confirm(`Delete "${tempPairs[index]}"?`)) {
-                tempPairs.splice(index, 1);
-                renderPairs();
-            }
-        };
-
-        // Edit question
-        window.editQuestion = function(index) {
-            showEditForm('question', index, tempQuestions[index], tempQuestionGroups[index]);
-        };
-
-        // Delete question
-        window.deleteQuestion = function(index) {
-            if (confirm(`Delete question "${tempQuestions[index]}"?`)) {
-                tempQuestions.splice(index, 1);
-                // Rebuild question groups
-                const newGroups = {};
-                Object.keys(tempQuestionGroups).forEach(key => {
-                    const idx = parseInt(key);
-                    if (idx < index) {
-                        newGroups[idx] = tempQuestionGroups[idx];
-                    } else if (idx > index) {
-                        newGroups[idx - 1] = tempQuestionGroups[idx];
-                    }
-                });
-                tempQuestionGroups = newGroups;
-                renderQuestions();
-            }
-        };
-
-        // Show edit form
-        function showEditForm(type, index, value, groupKey = null) {
-            editForm.innerHTML = '';
-            
-            if (type === 'pair') {
-                editForm.innerHTML = `
-                    <div class="edit-form-title">${index === -1 ? 'Add' : 'Edit'} Trading Pair</div>
-                    <div class="form-group">
-                        <label class="form-label">Pair Symbol</label>
-                        <input type="text" class="form-input" id="editInput" value="${value}" placeholder="e.g., EURUSD">
-                    </div>
-                    <div class="form-actions">
-                        <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
-                        <button class="form-btn save" onclick="savePairEdit(${index})">Save</button>
-                    </div>
-                `;
-            } else {
-                const groupOptions = Object.keys(ANSWER_GROUPS).map(key => {
-                    const selected = key === groupKey ? 'selected' : '';
-                    return `<option value="${key}" ${selected}>${ANSWER_GROUPS[key].name}</option>`;
-                }).join('');
-                
-                editForm.innerHTML = `
-                    <div class="edit-form-title">${index === -1 ? 'Add' : 'Edit'} Question</div>
-                    <div class="form-group">
-                        <label class="form-label">Question Text</label>
-                        <input type="text" class="form-input" id="editInput" value="${value}" placeholder='e.g., What is your "Daily Bias"?'>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">
-                            Tip: Use "quotes" to set column header in snapshot
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Answer Group</label>
-                        <select class="form-select" id="editGroup">
-                            ${groupOptions}
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
-                        <button class="form-btn save" onclick="saveQuestionEdit(${index})">Save</button>
-                    </div>
-                `;
-            }
-            
-            editModal.classList.add('show');
+function handleAnswer(answer) {
+    const pair = state.pairs[state.currentPairIndex];
+    state.answerHistory.push({
+        pairIndex: state.currentPairIndex,
+        questionIndex: state.currentQuestionIndex,
+        answer
+    });
+    state.answers[pair].push(answer);
+    addMessage(answer, false);
+    const messages = chatContainer.querySelectorAll('.message');
+    if (messages.length >= 2) {
+        const bg = messages[messages.length - 2].querySelector('.button-group');
+        if (bg) bg.style.display = 'none';
+    }
+    state.currentQuestionIndex++;
+    if (state.currentQuestionIndex >= state.questions.length) {
+        state.currentPairIndex++;
+        state.currentQuestionIndex = 0;
+        if (state.currentPairIndex < state.pairs.length) {
             setTimeout(() => {
-                document.getElementById('editInput').focus();
-            }, 100);
+                addMessage(`✓ ${pair} complete\n\n→ Moving to ${state.pairs[state.currentPairIndex]}`, true);
+                setTimeout(askNextQuestion, 500);
+            }, 300);
+            return;
         }
+    }
+    setTimeout(askNextQuestion, 300);
+}
 
-        // Close edit form
-        window.closeEditForm = function() {
-            editModal.classList.remove('show');
+// Back one question
+backBtn.addEventListener('click', () => {
+    if (state.phase !== 'session' || state.answerHistory.length === 0) return;
+    const last = state.answerHistory.pop();
+    const pair = state.pairs[last.pairIndex];
+    if (state.answers[pair] && state.answers[pair].length > 0) state.answers[pair].pop();
+    state.currentPairIndex = last.pairIndex;
+    state.currentQuestionIndex = last.questionIndex;
+    const messages = chatContainer.querySelectorAll('.message');
+    if (messages.length >= 1) messages[messages.length - 1].remove();
+    if (messages.length >= 2) messages[messages.length - 2].remove();
+    setTimeout(() => askNextQuestion(), 100);
+});
+
+// ============================================
+// SNAPSHOT GENERATION
+// ============================================
+function generateSnapshot() {
+    backBtn.classList.remove('show');
+    addMessage("✅ Checklist completed!\n\nGenerating your trading snapshot...", true);
+    showLoading();
+    setTimeout(() => {
+        hideLoading();
+        const canvas = createSnapshotCanvas();
+        const dataURL = canvas.toDataURL('image/png');
+
+        // Save session to history
+        const sessionData = {
+            timestamp: state.timestamp,
+            pairs: [...state.pairs],
+            questions: [...state.questions],
+            answers: JSON.parse(JSON.stringify(state.answers)),
+            snapshot: dataURL
         };
+        saveSession(sessionData);
 
-        // Save pair edit
-        window.savePairEdit = function(index) {
-            const input = document.getElementById('editInput');
-            const value = input.value.trim().toUpperCase();
-            
-            if (!value) {
-                alert('⚠️ Please enter a pair symbol');
-                return;
-            }
-            
-            if (index === -1) {
-                tempPairs.push(value);
-            } else {
-                tempPairs[index] = value;
-            }
-            
-            renderPairs();
-            closeEditForm();
-        };
-
-        // Save question edit
-        window.saveQuestionEdit = function(index) {
-            const input = document.getElementById('editInput');
-            const groupSelect = document.getElementById('editGroup');
-            const value = input.value.trim();
-            const groupKey = groupSelect.value;
-            
-            if (!value) {
-                alert('⚠️ Please enter a question');
-                return;
-            }
-            
-            if (index === -1) {
-                tempQuestions.push(value);
-                tempQuestionGroups[tempQuestions.length - 1] = groupKey;
-            } else {
-                tempQuestions[index] = value;
-                tempQuestionGroups[index] = groupKey;
-            }
-            
-            renderQuestions();
-            closeEditForm();
-        };
-
-        // Export configuration
-        exportBtn.addEventListener('click', exportConfig);
-        
-        function exportConfig() {
-            const config = {
-                version: '1.0',
-                timestamp: new Date().toISOString(),
-                pairs: tempPairs,
-                questions: tempQuestions.map((q, i) => ({
-                    text: q,
-                    group: tempQuestionGroups[i]
-                }))
-            };
-            
-            const json = JSON.stringify(config, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            const date = new Date().toISOString().slice(0, 10);
-            link.download = `trading_config_${date}.json`;
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            addMessage('📤 Configuration exported successfully!', true);
-        }
-
-        // Import configuration
-        importBtn.addEventListener('click', () => {
-            importFileInput.click();
-        });
-        
-        importFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const config = JSON.parse(event.target.result);
-                    
-                    // Validate
-                    if (!config.pairs || !Array.isArray(config.pairs)) {
-                        throw new Error('Invalid configuration: pairs missing');
-                    }
-                    if (!config.questions || !Array.isArray(config.questions)) {
-                        throw new Error('Invalid configuration: questions missing');
-                    }
-                    
-                    // Load configuration
-                    tempPairs = config.pairs;
-                    tempQuestions = [];
-                    tempQuestionGroups = {};
-                    
-                    config.questions.forEach((q, i) => {
-                        tempQuestions.push(q.text);
-                        tempQuestionGroups[i] = q.group || 'bias';
-                    });
-                    
-                    // Render
-                    renderSettings();
-                    
-                    addMessage('📥 Configuration imported successfully!', true);
-                } catch (error) {
-                    alert('❌ Invalid configuration file: ' + error.message);
-                }
-            };
-            reader.readAsText(file);
-            
-            // Reset input
-            e.target.value = '';
-        });
-
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
-        const chatContainer = document.getElementById('chatContainer');
-        const inputContainer = document.getElementById('inputContainer');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        function addMessage(text, isBot = true, buttons = null) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = isBot ? 'message message-bot' : 'message message-user';
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            
-            const label = document.createElement('div');
-            label.className = 'message-label';
-            label.textContent = isBot ? 'Trading Partner' : 'You';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            bubble.innerHTML = text.replace(/\n/g, '<br>');
-            
-            contentDiv.appendChild(label);
-            contentDiv.appendChild(bubble);
-            
-            if (buttons) {
-                const btnGroup = document.createElement('div');
-                btnGroup.className = 'button-group';
-                buttons.forEach(btn => {
-                    const button = document.createElement('button');
-                    button.className = `btn ${btn.class || 'btn-primary'}`;
-                    button.textContent = btn.text;
-                    button.onclick = btn.action;
-                    btnGroup.appendChild(button);
-                });
-                contentDiv.appendChild(btnGroup);
-            }
-            
-            messageDiv.appendChild(contentDiv);
-            
-            // Insert BEFORE the anchor (not append to container)
-            const anchor = document.getElementById('scrollAnchor');
-            chatContainer.insertBefore(messageDiv, anchor);
-            
-            // Scroll to the anchor (real element, honest geometry)
-            scrollToAnchor();
-        }
-
-        function showLoading() {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message message-bot';
-            loadingDiv.id = 'loading';
-            loadingDiv.innerHTML = `
-                <div class="message-content">
-                    <div class="message-label">Trading Partner</div>
-                    <div class="message-bubble">
-                        <div class="loading">
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
-                            <div class="loading-dot"></div>
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message message-bot';
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-label">Trading Partner</div>
+                <div class="message-bubble">
+                    📸 Your Trading Plan Snapshot — saved to history!
+                    <div class="snapshot-container">
+                        <img src="${dataURL}" class="snapshot-image" id="snapshotImg" alt="Trading Plan">
+                        <div class="snapshot-actions">
+                            <button class="btn btn-primary" id="downloadBtn">💾 Download</button>
+                            <button class="btn btn-verdict" id="newSessionBtn">🔄 New Session</button>
                         </div>
                     </div>
                 </div>
-            `;
-            const anchor = document.getElementById('scrollAnchor');
-            chatContainer.insertBefore(loadingDiv, anchor);
-            scrollToAnchor();
-        }
+            </div>
+        `;
+        const anchor = document.getElementById('scrollAnchor');
+        chatContainer.insertBefore(messageDiv, anchor);
+        scrollToAnchor();
 
-        function hideLoading() {
-            const loading = document.getElementById('loading');
-            if (loading) loading.remove();
-        }
+        document.getElementById('downloadBtn').onclick = () => downloadSnapshot(dataURL);
+        document.getElementById('newSessionBtn').onclick = startSession;
+        document.getElementById('snapshotImg').onclick = () => viewFullscreen(dataURL);
+    }, 1200);
+}
 
-        function showInput(placeholder = 'Type your answer...') {
-            inputContainer.style.display = 'block';
-            messageInput.placeholder = placeholder;
-            messageInput.focus();
-        }
+function createSnapshotCanvas() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const width = 1200, padding = 60, headerHeight = 180, rowHeight = 70, footerHeight = 50;
+    const numRows = state.pairs.length;
+    const height = headerHeight + (numRows * rowHeight) + footerHeight + (padding * 2);
+    canvas.width = width; canvas.height = height;
 
-        function hideInput() {
-            inputContainer.style.display = 'none';
-            messageInput.value = '';
-        }
+    const bgPrimary='#0A0E27', bgHeader='#1A1F3A', accentCyan='#00D9FF', accentPurple='#7B61FF';
+    const textPrimary='#FFFFFF', textSecondary='#B8C5D6', border='#2D3548', rowAlt='#111628';
+    const verdictBuy='#00FF94', verdictSell='#FF4757', verdictStandby='#FFB800';
 
-        function scrollToAnchor() {
-            // Scroll to the actual anchor element - no calculations needed!
-            const anchor = document.getElementById('scrollAnchor');
-            
-            // Only scroll if user is at/near bottom
-            if (isUserAtBottom()) {
-                anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            } else {
-                showScrollButton();
-            }
-        }
+    ctx.fillStyle = bgPrimary; ctx.fillRect(0, 0, width, height);
+    let currentY = padding;
 
-        function forceScrollToAnchor() {
-            // Force scroll to anchor regardless of position
-            const anchor = document.getElementById('scrollAnchor');
-            anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            hideScrollButton();
-        }
+    // Header
+    ctx.fillStyle = bgHeader; ctx.fillRect(padding, currentY, width - padding*2, headerHeight);
+    const gradTop = ctx.createLinearGradient(padding,0,width-padding,0);
+    gradTop.addColorStop(0, accentCyan); gradTop.addColorStop(1, accentPurple);
+    ctx.fillStyle = gradTop; ctx.fillRect(padding, currentY, width-padding*2, 4);
+    ctx.fillStyle = textPrimary; ctx.font = 'bold 36px serif'; ctx.textAlign = 'center';
+    ctx.fillText('TRADING PLAN SNAPSHOT', width/2, currentY+60);
+    ctx.fillStyle = accentCyan; ctx.font = '18px monospace';
+    ctx.fillText(state.timestamp, width/2, currentY+100);
+    ctx.fillStyle = accentPurple; ctx.fillRect(width/2-50, currentY+120, 100, 2);
+    currentY += headerHeight;
 
-        function isUserAtBottom() {
-            // Check if user is within 150px of bottom
-            const threshold = 150;
-            const position = chatContainer.scrollTop + chatContainer.clientHeight;
-            const bottom = chatContainer.scrollHeight;
-            return (bottom - position) < threshold;
-        }
+    // Table Header
+    const pairColWidth = 180;
+    const questionColWidth = (width - padding*2 - pairColWidth) / state.questions.length;
+    ctx.fillStyle = bgHeader; ctx.fillRect(padding, currentY, width-padding*2, rowHeight);
+    ctx.fillStyle = accentCyan; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
+    let colX = padding + 20;
+    ctx.fillText('PAIR', colX, currentY + rowHeight/2 + 6); colX += pairColWidth;
+    state.questions.forEach((question, i) => {
+        const quoted = question.match(/"([^"]+)"/);
+        const text = (quoted ? quoted[1] : question).toUpperCase();
+        const maxW = questionColWidth - 40;
+        const words = text.split(' '); let lines = [], cur = '';
+        words.forEach(w => { const t = cur + (cur?' ':'') + w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
+        if (cur) lines.push(cur);
+        if (lines.length === 1) { ctx.fillText(lines[0], colX, currentY+rowHeight/2+6); }
+        else { const sh = 18, sy = currentY+(rowHeight-lines.length*sh)/2+6; lines.slice(0,2).forEach((l,idx)=>ctx.fillText(l,colX,sy+idx*sh)); }
+        if (i < state.questions.length-1) { ctx.fillStyle=border; ctx.fillRect(colX-10,currentY+15,2,rowHeight-30); ctx.fillStyle=accentCyan; }
+        colX += questionColWidth;
+    });
+    currentY += rowHeight;
 
-        // Old functions removed - we don't need them anymore!
-        // No more scrollTop calculations
-        // No more scrollHeight guessing
-        // Just scroll to the anchor element!
-
-        const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
-        
-        function showScrollButton() {
-            scrollToBottomBtn.classList.add('show');
-        }
-
-        function hideScrollButton() {
-            scrollToBottomBtn.classList.remove('show');
-        }
-
-        // Click handler for scroll button
-        scrollToBottomBtn.addEventListener('click', () => {
-            const anchor = document.getElementById('scrollAnchor');
-            anchor.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            hideScrollButton();
+    // Rows
+    state.pairs.forEach((pair, rowIdx) => {
+        if (rowIdx%2===0) { ctx.fillStyle=rowAlt; ctx.fillRect(padding,currentY,width-padding*2,rowHeight); }
+        ctx.fillStyle=border; ctx.fillRect(padding,currentY,width-padding*2,1);
+        colX = padding+20;
+        ctx.fillStyle=textPrimary; ctx.font='15px monospace'; ctx.textAlign='left';
+        ctx.fillText(pair, colX, currentY+rowHeight/2+6); colX += pairColWidth;
+        (state.answers[pair]||[]).forEach((answer, ansIdx) => {
+            let d = answer;
+            const abbrev = [['Bullish Strong','Bull. Strong'],['Bullish Building','Bull. Building'],['Bullish Fading','Bull. Fading'],['Bullish Shifting','Bull. Shifting'],['Bullish Exhausted','Bull. Exhaust.'],['Bearish Strong','Bear. Strong'],['Bearish Building','Bear. Building'],['Bearish Fading','Bear. Fading'],['Bearish Shifting','Bear. Shifting'],['Bearish Exhausted','Bear. Exhaust.']];
+            abbrev.forEach(([f,t]) => { if (d.includes(f)) d = d.replace(f,t); });
+            let color = textSecondary;
+            if (answer.includes('📈')||answer.includes('⬆️')||answer.includes('▲')||answer.includes('🔥')||answer.includes('🌅')||answer.includes('Bullish')||answer.includes('Buy')||answer.includes('HL/HH')) color=verdictBuy;
+            else if (answer.includes('📉')||answer.includes('⬇️')||answer.includes('▼')||answer.includes('❄️')||answer.includes('🌑')||answer.includes('Bearish')||answer.includes('Sell')||answer.includes('LH/LL')) color=verdictSell;
+            else if (answer.includes('↔️')||answer.includes('➡️')||answer.includes('🔄')||answer.includes('⚡')||answer.includes('🌤️')||answer.includes('🌥️')||answer.includes('Sideways')||answer.includes('Stand by')||answer.includes('Choppy')||answer.includes('Fading')||answer.includes('Shifting')||answer.includes('Exhausted')) color=verdictStandby;
+            ctx.fillStyle=color; ctx.font='bold 15px monospace';
+            const mw = questionColWidth-40;
+            while(ctx.measureText(d+'...').width>mw && d.length>0) d=d.slice(0,-1);
+            if(d !== answer) d+='...';
+            ctx.fillText(d, colX, currentY+rowHeight/2+6);
+            if (ansIdx<state.questions.length-1) { ctx.fillStyle=border; ctx.fillRect(colX-10,currentY+15,2,rowHeight-30); }
+            colX += questionColWidth;
         });
+        currentY += rowHeight;
+    });
 
-        // Monitor scroll position to show/hide button
-        chatContainer.addEventListener('scroll', () => {
-            if (isUserAtBottom()) {
-                hideScrollButton();
-            }
+    // Footer
+    const gradBot = ctx.createLinearGradient(padding,0,width-padding,0);
+    gradBot.addColorStop(0,accentCyan); gradBot.addColorStop(1,accentPurple);
+    ctx.fillStyle=gradBot; ctx.fillRect(padding,currentY,width-padding*2,2);
+    currentY+=30;
+    ctx.fillStyle=textSecondary; ctx.font='14px monospace'; ctx.textAlign='center';
+    ctx.fillText('Trade with discipline. Protect your capital. Trust your process.', width/2, currentY);
+    return canvas;
+}
+
+function downloadSnapshot(dataURL) {
+    try {
+        const link = document.createElement('a');
+        link.download = `trading-plan-${new Date().toISOString().slice(0,10)}.png`;
+        link.href = dataURL;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        setTimeout(() => addMessage("✅ Snapshot downloaded!", true), 300);
+    } catch(e) { window.open(dataURL, '_blank'); }
+}
+
+function viewFullscreen(dataURL) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;';
+    overlay.innerHTML = `<img src="${dataURL}" style="max-width:95%;max-height:95%;box-shadow:0 0 50px rgba(0,217,255,0.3);">`;
+    overlay.onclick = () => overlay.remove();
+    document.body.appendChild(overlay);
+}
+
+// ============================================
+// HISTORY PANEL
+// ============================================
+document.getElementById('historyBtn').addEventListener('click', openHistory);
+document.getElementById('closeHistoryBtn').addEventListener('click', () => historyOverlay.classList.remove('show'));
+
+function openHistory() {
+    renderHistory();
+    historyOverlay.classList.add('show');
+}
+
+function renderHistory() {
+    const sessions = loadSessions();
+    const content = document.getElementById('historyContent');
+    if (sessions.length === 0) {
+        content.innerHTML = '<div class="history-empty">📭 No sessions saved yet.<br><br>Complete a session to see it here.</div>';
+        return;
+    }
+    content.innerHTML = '';
+    sessions.forEach((session, idx) => {
+        const card = document.createElement('div');
+        card.className = 'history-session-detail';
+        const numCols = (session.questions||[]).length;
+        let gridHTML = `<div class="history-answers-grid" style="--num-cols:${numCols}">`;
+        // Headers
+        gridHTML += `<div class="grid-header">Pair</div>`;
+        (session.questions||[]).forEach(q => {
+            const quoted = q.match(/"([^"]+)"/);
+            gridHTML += `<div class="grid-header">${quoted ? quoted[1] : q}</div>`;
         });
-
-        // Back button functionality
-        backBtn.addEventListener('click', goBackOneQuestion);
-
-        function goBackOneQuestion() {
-            // Can only go back during active session
-            if (state.phase !== 'session' || state.answerHistory.length === 0) {
-                return;
-            }
-
-            // Get last answer from history
-            const lastAnswer = state.answerHistory.pop();
-            
-            // Remove that answer from state
-            const pair = state.pairs[lastAnswer.pairIndex];
-            if (state.answers[pair] && state.answers[pair].length > 0) {
-                state.answers[pair].pop();
-            }
-
-            // Update current position
-            state.currentPairIndex = lastAnswer.pairIndex;
-            state.currentQuestionIndex = lastAnswer.questionIndex;
-
-            // Remove last 2 messages (answer + question or just answer)
-            const messages = chatContainer.querySelectorAll('.message');
-            if (messages.length >= 1) {
-                // Remove last message (the user's answer or next question)
-                messages[messages.length - 1].remove();
-            }
-            if (messages.length >= 2) {
-                // Remove the question that was answered
-                messages[messages.length - 2].remove();
-            }
-
-            // Re-ask the question
-            setTimeout(() => {
-                askNextQuestion();
-            }, 100);
-        }
-
-        function clearChat() {
-            chatContainer.innerHTML = '';
-            // Re-add anchor
-            const anchor = document.createElement('div');
-            anchor.className = 'scroll-anchor';
-            anchor.id = 'scrollAnchor';
-            chatContainer.appendChild(anchor);
-        }
-
-        // ============================================
-        // SETUP FLOW
-        // ============================================
-        
-        function showWelcome() {
-            clearChat();
-            
-            if (state.phase === 'welcome-back') {
-                addMessage(
-                    `Welcome back! 💙\n\nYour pairs: ${state.pairs.join(', ')}\n\nReady to start your session?`,
-                    true,
-                    [
-                        { text: '▶ Start Session', class: 'btn-primary', action: startSession },
-                        { text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup }
-                    ]
-                );
-            } else {
-                const welcomeHTML = `
-                    <div class="welcome-screen">
-                        <div class="welcome-icon">💹</div>
-                        <div class="welcome-title">Trading Partner</div>
-                        <div class="welcome-subtitle">
-                            Your pre-trade accountability system.<br>
-                            Enforce discipline. Prevent impulsive trades.<br>
-                            Trade your plan, not your emotions.
-                        </div>
-                    </div>
-                `;
-                chatContainer.innerHTML = welcomeHTML;
-                // Re-add anchor after clearing
-                const anchor = document.createElement('div');
-                anchor.className = 'scroll-anchor';
-                anchor.id = 'scrollAnchor';
-                chatContainer.appendChild(anchor);
-                
-                forceScrollToAnchor();
-                
-                setTimeout(() => {
-                    addMessage(
-                        "Welcome! I'm your trading accountability partner. 🎯\n\nLet's set up your custom trading framework. This only takes 2 minutes.",
-                        true,
-                        [{ text: '🚀 Get Started', class: 'btn-primary', action: startSetup }]
-                    );
-                }, 800);
-            }
-        }
-
-        function startSetup() {
-            // Reset all configuration
-            state.pairs = [];
-            state.questions = [];
-            state.questionGroups = {};
-            state.currentQuestionSetup = 0;
-            state.questionCount = 0;
-            
-            state.setupStep = 'pairs';
-            state.phase = 'setup';
-            addMessage("Step 1 of 3: Trading Pairs\n\nEnter your pairs separated by commas.\n\nExample: EURUSD, GBPUSD, XAUUSD, USDJPY", true);
-            showInput('Enter pairs (e.g., EURUSD, GBPUSD)');
-        }
-
-        function handleSetupInput(input) {
-            if (state.setupStep === 'pairs') {
-                const pairs = input.split(',').map(p => p.trim().toUpperCase()).filter(p => p.length > 0);
-                
-                if (pairs.length === 0) {
-                    addMessage("❌ Please enter at least one trading pair.", true);
-                    return;
-                }
-                
-                state.pairs = pairs;
-                state.setupStep = 'question-count';
-                
-                addMessage(`✅ Pairs configured: ${pairs.join(', ')}`, true);
-                setTimeout(() => {
-                    addMessage(
-                        "Step 2 of 3: Questions\n\nHow many questions do you want to answer for each pair?\n\nRecommended: 3-5 questions",
-                        true
-                    );
-                    showInput('Enter number (e.g., 4)');
-                }, 500);
-                
-            } else if (state.setupStep === 'question-count') {
-                const count = parseInt(input);
-                
-                if (isNaN(count) || count < 1 || count > 10) {
-                    addMessage("❌ Please enter a number between 1 and 10.", true);
-                    return;
-                }
-                
-                state.questionCount = count;
-                state.setupStep = 'questions';
-                state.currentQuestionSetup = 0;
-                
-                addMessage(`✅ You'll answer ${count} questions per pair.`, true);
-                setTimeout(() => {
-                    askForQuestion();
-                }, 500);
-                
-            } else if (state.setupStep === 'questions') {
-                const questionText = input.trim();
-                
-                if (!questionText) {
-                    addMessage("❌ Please enter a question.", true);
-                    return;
-                }
-                
-                state.questions.push(questionText);
-                state.currentQuestionSetup++;
-                
-                if (state.currentQuestionSetup < state.questionCount) {
-                    addMessage(`✅ Question ${state.currentQuestionSetup} saved!`, true);
-                    setTimeout(() => {
-                        askForQuestion();
-                    }, 500);
-                } else {
-                    // All questions entered, now select answer groups
-                    state.setupStep = 'groups';
-                    state.currentQuestionSetup = 0;
-                    addMessage(`✅ All questions saved!`, true);
-                    setTimeout(() => {
-                        askForAnswerGroup();
-                    }, 500);
-                }
-            }
-        }
-
-        function askForQuestion() {
-            const num = state.currentQuestionSetup + 1;
-            addMessage(
-                `Question ${num} of ${state.questionCount}\n\nWhat question do you want to ask?\n\nExample: "Daily Bias" or "Order Flow" or "M15 Structure"`,
-                true
-            );
-            showInput(`Enter question ${num}...`);
-        }
-
-        function askForAnswerGroup() {
-            if (state.currentQuestionSetup >= state.questions.length) {
-                // Setup complete
-                finishSetup();
-                return;
-            }
-            
-            const questionText = state.questions[state.currentQuestionSetup];
-            const num = state.currentQuestionSetup + 1;
-            
-            hideInput();
-            
-            addMessage(
-                `Question ${num}: "${questionText}"\n\nWhich answer group should I use for this question?`,
-                true
-            );
-            
-            // Show answer group options as buttons
-            const buttons = Object.keys(ANSWER_GROUPS).map(key => {
-                const group = ANSWER_GROUPS[key];
-                if (!group || !group.answers) {
-                    console.error('Invalid group:', key, group);
-                    return null;
-                }
-                return {
-                    text: `📋 ${group.name}`,
-                    class: 'btn-verdict',
-                    action: () => showAnswerGroupPreview(key)
-                };
-            }).filter(b => b !== null);
-            
-            addMessage(
-                `Choose one to see its options:`,
-                true,
-                buttons
-            );
-        }
-        
-        function showAnswerGroupPreview(groupKey) {
-            const group = ANSWER_GROUPS[groupKey];
-            if (!group || !group.answers) return;
-            
-            // Hide the selection buttons
-            const messages = chatContainer.querySelectorAll('.message');
-            if (messages.length >= 1) {
-                const prevMessage = messages[messages.length - 1];
-                const buttonGroup = prevMessage.querySelector('.button-group');
-                if (buttonGroup) {
-                    buttonGroup.style.display = 'none';
-                }
-            }
-            
-            // Show preview of this group's answers
-            const preview = group.answers.map(a => a.text).join(' • ');
-            addMessage(
-                `📋 ${group.name}\n\n${preview}\n\nUse this group?`,
-                true,
-                [
-                    { text: '✅ Yes, use this', class: 'btn-primary', action: () => confirmAnswerGroup(groupKey) },
-                    { text: '← Choose different', class: 'btn-verdict', action: () => {
-                        // Hide current buttons and go back
-                        const msgs = chatContainer.querySelectorAll('.message');
-                        if (msgs.length >= 1) {
-                            const lastMsg = msgs[msgs.length - 1];
-                            const btns = lastMsg.querySelector('.button-group');
-                            if (btns) btns.style.display = 'none';
-                        }
-                        askForAnswerGroup();
-                    }}
-                ]
-            );
-        }
-        
-        function confirmAnswerGroup(groupKey) {
-            state.questionGroups[state.currentQuestionSetup] = groupKey;
-            
-            // Hide the confirmation buttons
-            const messages = chatContainer.querySelectorAll('.message');
-            if (messages.length >= 1) {
-                const prevMessage = messages[messages.length - 1];
-                const buttonGroup = prevMessage.querySelector('.button-group');
-                if (buttonGroup) {
-                    buttonGroup.style.display = 'none';
-                }
-            }
-            
-            state.currentQuestionSetup++;
-            
-            const groupName = ANSWER_GROUPS[groupKey].name;
-            addMessage(`✅ "${groupName}" selected!`, true);
-            
-            setTimeout(() => {
-                askForAnswerGroup();
-            }, 500);
-        }
-
-        function finishSetup() {
-            saveState();
-            state.phase = 'configured';
-            
-            hideInput();
-            addMessage(`🎉 Perfect! Your framework is configured.`, true);
-            
-            setTimeout(() => {
-                let summary = `📋 Your Setup:\n\nPairs: ${state.pairs.join(', ')}\n\nQuestions:\n`;
-                state.questions.forEach((q, i) => {
-                    const groupName = ANSWER_GROUPS[state.questionGroups[i]].name;
-                    summary += `${i + 1}. ${q} (${groupName})\n`;
-                });
-                
-                addMessage(
-                    summary,
-                    true,
-                    [{ text: '▶ Start First Session', class: 'btn-primary', action: startSession }]
-                );
-            }, 500);
-        }
-
-        // ============================================
-        // SESSION FLOW
-        // ============================================
-        
-        function startSession() {
-            state.phase = 'session';
-            state.currentPairIndex = 0;
-            state.currentQuestionIndex = 0;
-            state.answers = {};
-            state.answerHistory = [];
-            state.timestamp = new Date().toLocaleString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
+        // Rows
+        (session.pairs||[]).forEach(pair => {
+            gridHTML += `<div class="grid-cell pair-cell">${pair}</div>`;
+            const answers = (session.answers||{})[pair] || [];
+            answers.forEach(answer => {
+                let cls = '';
+                if (answer.includes('📈')||answer.includes('⬆️')||answer.includes('▲')||answer.includes('Bullish')||answer.includes('Buy')||answer.includes('HL/HH')) cls='buy-cell';
+                else if (answer.includes('📉')||answer.includes('⬇️')||answer.includes('▼')||answer.includes('Bearish')||answer.includes('Sell')||answer.includes('LH/LL')) cls='sell-cell';
+                else if (answer.includes('↔️')||answer.includes('Stand by')||answer.includes('Sideways')||answer.includes('Fading')||answer.includes('Shifting')) cls='standby-cell';
+                gridHTML += `<div class="grid-cell ${cls}">${answer}</div>`;
             });
-            
-            addMessage("✅ Session started!\n\nAnswer each question thoughtfully.\n\nRemember: If you're rushing, that's your signal to pause.", true);
-            
-            // Show back button
-            backBtn.classList.add('show');
-            
-            // Force scroll to bottom at session start
-            forceScrollToAnchor();
-            
-            setTimeout(() => {
-                askNextQuestion();
-            }, 800);
-        }
-
-        function askNextQuestion() {
-            if (state.currentPairIndex >= state.pairs.length) {
-                generateSnapshot();
-                return;
-            }
-            
-            const pair = state.pairs[state.currentPairIndex];
-            const question = state.questions[state.currentQuestionIndex];
-            const groupKey = state.questionGroups[state.currentQuestionIndex];
-            const answerGroup = ANSWER_GROUPS[groupKey];
-            
-            // Initialize answers for this pair if needed
-            if (!state.answers[pair]) {
-                state.answers[pair] = [];
-            }
-            
-            // Create buttons from answer group
-            const buttons = answerGroup.answers.map(answer => ({
-                text: answer.text,
-                class: `btn-verdict ${answer.class}`,
-                action: () => handleAnswer(answer.text)
-            }));
-            
-            addMessage(`💡 ${pair}\n\n${question}:`, true, buttons);
-            hideInput();
-        }
-
-        function handleAnswer(answer) {
-            const pair = state.pairs[state.currentPairIndex];
-            
-            // Save to history before adding new answer
-            state.answerHistory.push({
-                pairIndex: state.currentPairIndex,
-                questionIndex: state.currentQuestionIndex,
-                answer: answer
-            });
-            
-            state.answers[pair].push(answer);
-            
-            addMessage(answer, false);
-            
-            // Remove the previous message's buttons to prevent clicking again
-            const messages = chatContainer.querySelectorAll('.message');
-            if (messages.length >= 2) {
-                const prevMessage = messages[messages.length - 2];
-                const buttonGroup = prevMessage.querySelector('.button-group');
-                if (buttonGroup) {
-                    buttonGroup.style.display = 'none';
-                }
-            }
-            
-            // Move to next question
-            state.currentQuestionIndex++;
-            if (state.currentQuestionIndex >= state.questions.length) {
-                state.currentPairIndex++;
-                state.currentQuestionIndex = 0;
-                
-                if (state.currentPairIndex < state.pairs.length) {
-                    setTimeout(() => {
-                        addMessage(`✓ ${pair} complete\n\n→ Moving to ${state.pairs[state.currentPairIndex]}`, true);
-                        setTimeout(askNextQuestion, 500);
-                    }, 300);
-                    return;
-                }
-            }
-            
-            setTimeout(askNextQuestion, 300);
-        }
-
-        // ============================================
-        // SNAPSHOT GENERATION
-        // ============================================
-        
-        function generateSnapshot() {
-            // Hide back button when session complete
-            backBtn.classList.remove('show');
-            
-            addMessage("✅ Checklist completed!\n\nGenerating your trading snapshot...", true);
-            showLoading();
-            
-            setTimeout(() => {
-                hideLoading();
-                const canvas = createSnapshotCanvas();
-                const dataURL = canvas.toDataURL('image/png');
-                
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message message-bot';
-                messageDiv.innerHTML = `
-                    <div class="message-content">
-                        <div class="message-label">Trading Partner</div>
-                        <div class="message-bubble">
-                            📸 Your Trading Plan Snapshot
-                            <div class="snapshot-container">
-                                <img src="${dataURL}" class="snapshot-image" id="snapshotImage" alt="Trading Plan">
-                                <div class="snapshot-actions">
-                                    <button class="btn btn-primary" id="downloadBtn">💾 Download</button>
-                                    <button class="btn btn-verdict" id="newSessionBtn">🔄 New Session</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                const anchor = document.getElementById('scrollAnchor');
-                chatContainer.insertBefore(messageDiv, anchor);
-                scrollToAnchor();
-                
-                // Add event listeners
-                document.getElementById('downloadBtn').onclick = () => downloadSnapshot(dataURL);
-                document.getElementById('newSessionBtn').onclick = startSession;
-                document.getElementById('snapshotImage').onclick = () => viewFullscreen(dataURL);
-            }, 1500);
-        }
-
-        function createSnapshotCanvas() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Dimensions
-            const width = 1200;
-            const padding = 60;
-            const headerHeight = 180;
-            const rowHeight = 70;
-            const footerHeight = 50;
-            const numRows = state.pairs.length;
-            const numCols = state.questions.length + 1; // +1 for pair column
-            const height = headerHeight + (numRows * rowHeight) + footerHeight + (padding * 2);
-            
-            canvas.width = width;
-            canvas.height = height;
-            
-            // Colors
-            const bgPrimary = '#0A0E27';
-            const bgHeader = '#1A1F3A';
-            const accentCyan = '#00D9FF';
-            const accentPurple = '#7B61FF';
-            const textPrimary = '#FFFFFF';
-            const textSecondary = '#B8C5D6';
-            const border = '#2D3548';
-            const rowAlt = '#111628';
-            const verdictBuy = '#00FF94';
-            const verdictSell = '#FF4757';
-            const verdictStandby = '#FFB800';
-            
-            // Background
-            ctx.fillStyle = bgPrimary;
-            ctx.fillRect(0, 0, width, height);
-            
-            let currentY = padding;
-            
-            // ========== HEADER ==========
-            ctx.fillStyle = bgHeader;
-            ctx.fillRect(padding, currentY, width - padding * 2, headerHeight);
-            
-            const gradientTop = ctx.createLinearGradient(padding, 0, width - padding, 0);
-            gradientTop.addColorStop(0, accentCyan);
-            gradientTop.addColorStop(1, accentPurple);
-            ctx.fillStyle = gradientTop;
-            ctx.fillRect(padding, currentY, width - padding * 2, 4);
-            
-            ctx.fillStyle = textPrimary;
-            ctx.font = 'bold 36px serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('TRADING PLAN SNAPSHOT', width / 2, currentY + 60);
-            
-            ctx.fillStyle = accentCyan;
-            ctx.font = '18px monospace';
-            ctx.fillText(state.timestamp, width / 2, currentY + 100);
-            
-            const accentWidth = 100;
-            const accentY = currentY + 120;
-            ctx.fillStyle = accentPurple;
-            ctx.fillRect(width / 2 - accentWidth / 2, accentY, accentWidth, 2);
-            
-            currentY += headerHeight;
-            
-            // ========== TABLE HEADER ==========
-            const pairColWidth = 180;
-            const remainingWidth = width - (padding * 2) - pairColWidth;
-            const questionColWidth = remainingWidth / state.questions.length;
-            
-            ctx.fillStyle = bgHeader;
-            ctx.fillRect(padding, currentY, width - padding * 2, rowHeight);
-            
-            ctx.fillStyle = accentCyan;
-            ctx.font = 'bold 16px monospace';
-            ctx.textAlign = 'left';
-            
-            let colX = padding + 20;
-            
-            ctx.fillText('PAIR', colX, currentY + rowHeight / 2 + 6);
-            colX += pairColWidth;
-            
-            state.questions.forEach((question, i) => {
-                // Extract text between quotes for column header, or use full question
-                const quotedMatch = question.match(/"([^"]+)"/);
-                const columnText = quotedMatch ? quotedMatch[1] : question;
-                
-                const text = columnText.toUpperCase();
-                const maxWidth = questionColWidth - 40;
-                
-                const words = text.split(' ');
-                let lines = [];
-                let currentLine = '';
-                
-                words.forEach(word => {
-                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > maxWidth && currentLine) {
-                        lines.push(currentLine);
-                        currentLine = word;
-                    } else {
-                        currentLine = testLine;
-                    }
-                });
-                if (currentLine) lines.push(currentLine);
-                
-                if (lines.length === 1) {
-                    ctx.fillText(lines[0], colX, currentY + rowHeight / 2 + 6);
-                } else {
-                    const lineHeight = 18;
-                    const startY = currentY + (rowHeight - lines.length * lineHeight) / 2 + 6;
-                    lines.slice(0, 2).forEach((line, idx) => {
-                        ctx.fillText(line, colX, startY + idx * lineHeight);
-                    });
-                }
-                
-                if (i < state.questions.length - 1) {
-                    ctx.fillStyle = border;
-                    ctx.fillRect(colX - 10, currentY + 15, 2, rowHeight - 30);
-                    ctx.fillStyle = accentCyan;
-                }
-                
-                colX += questionColWidth;
-            });
-            
-            currentY += rowHeight;
-            
-            // ========== TABLE ROWS ==========
-            state.pairs.forEach((pair, rowIdx) => {
-                if (rowIdx % 2 === 0) {
-                    ctx.fillStyle = rowAlt;
-                    ctx.fillRect(padding, currentY, width - padding * 2, rowHeight);
-                }
-                
-                ctx.fillStyle = border;
-                ctx.fillRect(padding, currentY, width - padding * 2, 1);
-                
-                colX = padding + 20;
-                
-                ctx.fillStyle = textPrimary;
-                ctx.font = '15px monospace';
-                ctx.textAlign = 'left';
-                ctx.fillText(pair, colX, currentY + rowHeight / 2 + 6);
-                colX += pairColWidth;
-                
-                const pairAnswers = state.answers[pair] || [];
-                pairAnswers.forEach((answer, ansIdx) => {
-                    // Smart abbreviation for snapshot readability
-                    let displayText = answer;
-                    
-                    // Abbreviate "Bullish" and "Bearish" for momentum answers
-                    if (answer.includes('Bullish Strong')) displayText = answer.replace('Bullish Strong', 'Bull. Strong');
-                    else if (answer.includes('Bullish Building')) displayText = answer.replace('Bullish Building', 'Bull. Building');
-                    else if (answer.includes('Bullish Fading')) displayText = answer.replace('Bullish Fading', 'Bull. Fading');
-                    else if (answer.includes('Bullish Shifting')) displayText = answer.replace('Bullish Shifting', 'Bull. Shifting');
-                    else if (answer.includes('Bullish Exhausted')) displayText = answer.replace('Bullish Exhausted', 'Bull. Exhaust.');
-                    else if (answer.includes('Bearish Strong')) displayText = answer.replace('Bearish Strong', 'Bear. Strong');
-                    else if (answer.includes('Bearish Building')) displayText = answer.replace('Bearish Building', 'Bear. Building');
-                    else if (answer.includes('Bearish Fading')) displayText = answer.replace('Bearish Fading', 'Bear. Fading');
-                    else if (answer.includes('Bearish Shifting')) displayText = answer.replace('Bearish Shifting', 'Bear. Shifting');
-                    else if (answer.includes('Bearish Exhausted')) displayText = answer.replace('Bearish Exhausted', 'Bear. Exhaust.');
-                    
-                    // Color code based on emoji/keyword
-                    let color = textSecondary;
-                    if (answer.includes('📈') || answer.includes('⬆️') || answer.includes('▲') || answer.includes('🔥') || answer.includes('🌅') ||
-                        answer.includes('Bullish') || answer.includes('Buy') || answer.includes('HL/HH')) {
-                        color = verdictBuy;
-                    } else if (answer.includes('📉') || answer.includes('⬇️') || answer.includes('▼') || answer.includes('❄️') || answer.includes('🌑') ||
-                               answer.includes('Bearish') || answer.includes('Sell') || answer.includes('LH/LL')) {
-                        color = verdictSell;
-                    } else if (answer.includes('↔️') || answer.includes('➡️') || answer.includes('■') || answer.includes('🌤️') || answer.includes('🌥️') || 
-                               answer.includes('⚡') || answer.includes('🔄') ||
-                               answer.includes('Sideways') || answer.includes('Stand by') || answer.includes('Choppy') ||
-                               answer.includes('Fading') || answer.includes('Shifting') || answer.includes('Exhausted')) {
-                        color = verdictStandby;
-                    }
-                    
-                    ctx.fillStyle = color;
-                    ctx.font = 'bold 15px monospace';
-                    
-                    const maxWidth = questionColWidth - 40;
-                    // Only truncate if still too long after abbreviation
-                    if (ctx.measureText(displayText).width > maxWidth) {
-                        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
-                            displayText = displayText.slice(0, -1);
-                        }
-                        displayText += '...';
-                    }
-                    
-                    ctx.fillText(displayText, colX, currentY + rowHeight / 2 + 6);
-                    
-                    if (ansIdx < state.questions.length - 1) {
-                        ctx.fillStyle = border;
-                        ctx.fillRect(colX - 10, currentY + 15, 2, rowHeight - 30);
-                    }
-                    
-                    colX += questionColWidth;
-                });
-                
-                currentY += rowHeight;
-            });
-            
-            // ========== FOOTER ==========
-            const gradientBottom = ctx.createLinearGradient(padding, 0, width - padding, 0);
-            gradientBottom.addColorStop(0, accentCyan);
-            gradientBottom.addColorStop(1, accentPurple);
-            ctx.fillStyle = gradientBottom;
-            ctx.fillRect(padding, currentY, width - padding * 2, 2);
-            
-            currentY += 30;
-            
-            ctx.fillStyle = textSecondary;
-            ctx.font = '14px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText('Trade with discipline. Protect your capital. Trust your process.', width / 2, currentY);
-            
-            return canvas;
-        }
-
-        function downloadSnapshot(dataURL) {
-            try {
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().slice(0, 10);
-                link.download = `trading-plan-${timestamp}.png`;
-                link.href = dataURL;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                setTimeout(() => {
-                    addMessage("✅ Snapshot downloaded! Check your Downloads folder.", true);
-                }, 300);
-            } catch (error) {
-                window.open(dataURL, '_blank');
-                addMessage("📸 Snapshot opened in new tab. Right-click to save image.", true);
-            }
-        }
-
-        function viewFullscreen(dataURL) {
-            const win = window.open('', '_blank');
-            if (win) {
-                win.document.write(`
-                    <html>
-                    <head><title>Trading Plan Snapshot</title>
-                    <style>
-                        body { margin: 0; background: #000; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-                        img { max-width: 100%; max-height: 100vh; cursor: pointer; }
-                    </style>
-                    </head>
-                    <body><img src="${dataURL}" onclick="window.close()" title="Click to close" /></body>
-                    </html>
-                `);
-                win.document.close();
-            } else {
-                const imgWin = document.createElement('div');
-                imgWin.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;';
-                imgWin.innerHTML = `<img src="${dataURL}" style="max-width:90%;max-height:90%;box-shadow:0 0 50px rgba(0,217,255,0.3);">`;
-                imgWin.onclick = () => imgWin.remove();
-                document.body.appendChild(imgWin);
-            }
-        }
-
-        // ============================================
-        // EVENT LISTENERS
-        // ============================================
-        
-        sendBtn.addEventListener('click', () => {
-            const value = messageInput.value.trim();
-            if (!value) return;
-            
-            if (state.phase === 'setup') {
-                addMessage(value, false);
-                hideInput();
-                setTimeout(() => handleSetupInput(value), 300);
-            }
         });
+        gridHTML += '</div>';
 
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendBtn.click();
-            }
-        });
+        card.innerHTML = `
+            <div class="history-session-meta">
+                <div class="history-session-time">📅 ${session.timestamp}</div>
+                <div class="history-session-actions">
+                    ${session.snapshot ? `<button class="session-view-btn" onclick="viewSnapshotFromHistory('${idx}')">🖼 View</button>` : ''}
+                    ${session.snapshot ? `<button class="session-view-btn" onclick="downloadSnapshotFromHistory('${idx}')">💾</button>` : ''}
+                    <button class="session-delete-btn" onclick="removeSession(${idx})">🗑</button>
+                </div>
+            </div>
+            ${gridHTML}
+        `;
+        content.appendChild(card);
+    });
+}
 
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
-        });
+window.viewSnapshotFromHistory = function(idx) {
+    const sessions = loadSessions();
+    if (sessions[idx] && sessions[idx].snapshot) viewFullscreen(sessions[idx].snapshot);
+};
 
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        
-        loadState();
-        showWelcome();
+window.downloadSnapshotFromHistory = function(idx) {
+    const sessions = loadSessions();
+    if (sessions[idx] && sessions[idx].snapshot) downloadSnapshot(sessions[idx].snapshot);
+};
 
-        // Register service worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript;base64,' + btoa(`
-                self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => self.clients.claim());
-                self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
-            `));
-        }
-    </script>
+window.removeSession = function(idx) {
+    if (!confirm('Delete this session?')) return;
+    deleteSession(idx);
+    renderHistory();
+};
+
+// ============================================
+// SETTINGS PANEL — TABS
+// ============================================
+document.querySelectorAll('.settings-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    });
+});
+
+document.getElementById('settingsBtn').addEventListener('click', openSettings);
+document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
+let tempPairs = [], tempQuestions = [], tempQuestionGroups = {}, tempCustomGroups = {};
+
+function openSettings() {
+    tempPairs = [...state.pairs];
+    tempQuestions = [...state.questions];
+    tempQuestionGroups = {...state.questionGroups};
+    tempCustomGroups = JSON.parse(JSON.stringify(loadCustomGroups()));
+    renderSettings();
+    settingsOverlay.classList.add('show');
+}
+
+function closeSettings() {
+    settingsOverlay.classList.remove('show');
+}
+
+function saveSettings() {
+    if (tempPairs.length === 0) { alert('⚠️ Add at least one pair'); return; }
+    if (tempQuestions.length === 0) { alert('⚠️ Add at least one question'); return; }
+    state.pairs = tempPairs;
+    state.questions = tempQuestions;
+    state.questionGroups = tempQuestionGroups;
+    saveCustomGroups(tempCustomGroups);
+    state.customGroups = tempCustomGroups;
+    saveConfig();
+    state.phase = 'welcome-back';
+    closeSettings();
+    addMessage('✅ Configuration saved!', true);
+    showWelcome();
+}
+
+function renderSettings() {
+    renderPairs();
+    renderQuestions();
+    renderAnswerGroups();
+}
+
+function renderPairs() {
+    const list = document.getElementById('pairsList');
+    list.innerHTML = '';
+    if (tempPairs.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-secondary);text-align:center;padding:16px">No pairs configured</div>';
+        return;
+    }
+    tempPairs.forEach((pair, i) => {
+        const item = document.createElement('div');
+        item.className = 'config-item';
+        item.innerHTML = `
+            <div class="config-item-content"><div class="config-item-text">${pair}</div></div>
+            <div class="config-item-actions">
+                <button class="icon-btn" ${i===0?'disabled style="opacity:.3"':''} onclick="movePairUp(${i})">↑</button>
+                <button class="icon-btn" ${i===tempPairs.length-1?'disabled style="opacity:.3"':''} onclick="movePairDown(${i})">↓</button>
+                <button class="icon-btn edit" onclick="editPair(${i})">✏️</button>
+                <button class="icon-btn delete" onclick="deletePair(${i})">🗑️</button>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function renderQuestions() {
+    const list = document.getElementById('questionsList');
+    list.innerHTML = '';
+    if (tempQuestions.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-secondary);text-align:center;padding:16px">No questions configured</div>';
+        return;
+    }
+    const allGroups = { ...BUILTIN_GROUPS, ...tempCustomGroups };
+    tempQuestions.forEach((q, i) => {
+        const gk = tempQuestionGroups[i];
+        const gn = allGroups[gk] ? allGroups[gk].name : 'Not set';
+        const item = document.createElement('div');
+        item.className = 'config-item';
+        item.innerHTML = `
+            <div class="config-item-content">
+                <div class="config-item-text">${i+1}. ${q}</div>
+                <div class="config-item-meta">Answer Group: ${gn}</div>
+            </div>
+            <div class="config-item-actions">
+                <button class="icon-btn" ${i===0?'disabled style="opacity:.3"':''} onclick="moveQuestionUp(${i})">↑</button>
+                <button class="icon-btn" ${i===tempQuestions.length-1?'disabled style="opacity:.3"':''} onclick="moveQuestionDown(${i})">↓</button>
+                <button class="icon-btn edit" onclick="editQuestion(${i})">✏️</button>
+                <button class="icon-btn delete" onclick="deleteQuestion(${i})">🗑️</button>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function renderAnswerGroups() {
+    // Builtin (read-only)
+    const builtinList = document.getElementById('builtinGroupsList');
+    builtinList.innerHTML = '';
+    Object.keys(BUILTIN_GROUPS).forEach(key => {
+        const g = BUILTIN_GROUPS[key];
+        const card = document.createElement('div');
+        card.className = 'answer-group-card';
+        card.style.opacity = '0.7';
+        card.innerHTML = `
+            <div class="answer-group-header">
+                <div class="answer-group-name">${g.name} <span style="font-size:10px;color:var(--text-secondary)">(built-in)</span></div>
+            </div>
+            <div class="answer-tags">${g.answers.map(a=>`<div class="answer-tag ${a.class}">${a.text}</div>`).join('')}</div>
+        `;
+        builtinList.appendChild(card);
+    });
+
+    // Custom groups
+    const customList = document.getElementById('customGroupsList');
+    customList.innerHTML = '';
+    const keys = Object.keys(tempCustomGroups);
+    if (keys.length === 0) {
+        customList.innerHTML = '<div style="color:var(--text-secondary);font-size:12px;padding:8px 0 12px">No custom groups yet.</div>';
+    }
+    keys.forEach(key => {
+        const g = tempCustomGroups[key];
+        const card = document.createElement('div');
+        card.className = 'answer-group-card';
+        card.innerHTML = `
+            <div class="answer-group-header">
+                <div class="answer-group-name">✨ ${g.name}</div>
+                <div style="display:flex;gap:6px">
+                    <button class="icon-btn edit" onclick="editCustomGroup('${key}')">✏️</button>
+                    <button class="icon-btn delete" onclick="deleteCustomGroup('${key}')">🗑️</button>
+                </div>
+            </div>
+            <div class="answer-tags">${(g.answers||[]).map(a=>`<div class="answer-tag ${a.class}">${a.text}</div>`).join('')}</div>
+        `;
+        customList.appendChild(card);
+    });
+}
+
+// Pair actions
+window.movePairUp = i => { if(i>0){const t=tempPairs[i];tempPairs[i]=tempPairs[i-1];tempPairs[i-1]=t;renderPairs();} };
+window.movePairDown = i => { if(i<tempPairs.length-1){const t=tempPairs[i];tempPairs[i]=tempPairs[i+1];tempPairs[i+1]=t;renderPairs();} };
+window.editPair = i => showEditForm('pair', i, tempPairs[i]);
+window.deletePair = i => { if(confirm(`Delete "${tempPairs[i]}"?`)){tempPairs.splice(i,1);renderPairs();} };
+
+// Question actions
+window.moveQuestionUp = i => {
+    if(i>0){const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i-1];tempQuestions[i-1]=t;const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i-1];tempQuestionGroups[i-1]=tg;renderQuestions();}
+};
+window.moveQuestionDown = i => {
+    if(i<tempQuestions.length-1){const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i+1];tempQuestions[i+1]=t;const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i+1];tempQuestionGroups[i+1]=tg;renderQuestions();}
+};
+window.editQuestion = i => showEditForm('question', i, tempQuestions[i], tempQuestionGroups[i]);
+window.deleteQuestion = i => {
+    if(confirm(`Delete question "${tempQuestions[i]}"?`)){
+        tempQuestions.splice(i,1);
+        const ng={};Object.keys(tempQuestionGroups).forEach(k=>{const idx=parseInt(k);if(idx<i)ng[idx]=tempQuestionGroups[idx];else if(idx>i)ng[idx-1]=tempQuestionGroups[idx];});
+        tempQuestionGroups=ng;renderQuestions();
+    }
+};
+
+// Custom group actions
+window.editCustomGroup = key => showCustomGroupForm(key, tempCustomGroups[key]);
+window.deleteCustomGroup = key => {
+    if(confirm(`Delete custom group "${tempCustomGroups[key].name}"?`)){
+        delete tempCustomGroups[key];
+        renderAnswerGroups();
+    }
+};
+
+document.getElementById('addPairBtn').addEventListener('click', () => showEditForm('pair', -1, ''));
+document.getElementById('addQuestionBtn').addEventListener('click', () => showEditForm('question', -1, '', 'bias'));
+document.getElementById('addCustomGroupBtn').addEventListener('click', () => showCustomGroupForm(null, null));
+
+// ============================================
+// EDIT FORMS
+// ============================================
+function showEditForm(type, index, value, groupKey = null) {
+    editForm.innerHTML = '';
+    if (type === 'pair') {
+        editForm.innerHTML = `
+            <div class="edit-form-title">${index===-1?'Add':'Edit'} Trading Pair</div>
+            <div class="form-group">
+                <label class="form-label">Pair Symbol</label>
+                <input type="text" class="form-input" id="editInput" value="${value}" placeholder="e.g., EURUSD">
+            </div>
+            <div class="form-actions">
+                <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
+                <button class="form-btn save" onclick="savePairEdit(${index})">Save</button>
+            </div>
+        `;
+    } else {
+        const allGroups = { ...BUILTIN_GROUPS, ...tempCustomGroups };
+        const options = Object.keys(allGroups).map(k => `<option value="${k}" ${k===groupKey?'selected':''}>${allGroups[k].name}${k in tempCustomGroups?' ✨':''}</option>`).join('');
+        editForm.innerHTML = `
+            <div class="edit-form-title">${index===-1?'Add':'Edit'} Question</div>
+            <div class="form-group">
+                <label class="form-label">Question Text</label>
+                <input type="text" class="form-input" id="editInput" value="${value}" placeholder='e.g., What is your "Daily Bias"?'>
+                <div class="form-hint">Use "quotes" to set the snapshot column header</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Answer Group</label>
+                <select class="form-select" id="editGroup">${options}</select>
+            </div>
+            <div class="form-actions">
+                <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
+                <button class="form-btn save" onclick="saveQuestionEdit(${index})">Save</button>
+            </div>
+        `;
+    }
+    editModal.classList.add('show');
+    setTimeout(() => document.getElementById('editInput') && document.getElementById('editInput').focus(), 100);
+}
+
+function showCustomGroupForm(existingKey, existingGroup) {
+    const isNew = existingKey === null;
+    const answers = existingGroup ? existingGroup.answers : [{ text: '', class: '' }];
+
+    editForm.innerHTML = `
+        <div class="edit-form-title">${isNew ? 'Create' : 'Edit'} Custom Answer Group</div>
+        <div class="form-group">
+            <label class="form-label">Group Name</label>
+            <input type="text" class="form-input" id="groupNameInput" value="${existingGroup ? existingGroup.name : ''}" placeholder="e.g., My Setup Conditions">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Answer Options</label>
+            <div class="answer-builder" id="answerBuilder"></div>
+            <button type="button" class="add-answer-row-btn" id="addAnswerRowBtn" style="width:100%;margin-top:8px">+ Add Answer</button>
+        </div>
+        <div class="form-actions">
+            <button class="form-btn cancel" onclick="closeEditForm()">Cancel</button>
+            <button class="form-btn save" onclick="saveCustomGroup('${existingKey||''}', ${isNew})">Save Group</button>
+        </div>
+    `;
+    editModal.classList.add('show');
+
+    const builder = document.getElementById('answerBuilder');
+    function addAnswerRow(text='', cls='') {
+        const row = document.createElement('div');
+        row.className = 'answer-builder-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Answer text (e.g., 🔥 Strong Confluence)" value="${text.replace(/"/g,'&quot;')}">
+            <select class="answer-color-select">
+                <option value="" ${cls===''?'selected':''}>⬜ Neutral</option>
+                <option value="buy" ${cls==='buy'?'selected':''}>🟢 Buy</option>
+                <option value="sell" ${cls==='sell'?'selected':''}>🔴 Sell</option>
+                <option value="standby" ${cls==='standby'?'selected':''}>🟡 Standby</option>
+            </select>
+            <button type="button" class="answer-remove-btn" onclick="this.parentElement.remove()">✕</button>
+        `;
+        builder.appendChild(row);
+    }
+
+    answers.forEach(a => addAnswerRow(a.text, a.class));
+    document.getElementById('addAnswerRowBtn').addEventListener('click', () => addAnswerRow());
+    setTimeout(() => document.getElementById('groupNameInput').focus(), 100);
+}
+
+window.saveCustomGroup = function(existingKey, isNew) {
+    const nameInput = document.getElementById('groupNameInput');
+    const name = nameInput.value.trim();
+    if (!name) { alert('⚠️ Please enter a group name'); return; }
+    const rows = document.querySelectorAll('#answerBuilder .answer-builder-row');
+    const answers = [];
+    rows.forEach(row => {
+        const text = row.querySelector('input').value.trim();
+        const cls = row.querySelector('select').value;
+        if (text) answers.push({ text, class: cls });
+    });
+    if (answers.length === 0) { alert('⚠️ Add at least one answer option'); return; }
+    const key = isNew ? 'custom_' + Date.now() : existingKey;
+    tempCustomGroups[key] = { name, answers };
+    renderAnswerGroups();
+    closeEditForm();
+};
+
+window.closeEditForm = function() { editModal.classList.remove('show'); };
+
+window.savePairEdit = function(index) {
+    const v = document.getElementById('editInput').value.trim().toUpperCase();
+    if (!v) { alert('⚠️ Please enter a pair symbol'); return; }
+    if (index === -1) tempPairs.push(v); else tempPairs[index] = v;
+    renderPairs(); closeEditForm();
+};
+
+window.saveQuestionEdit = function(index) {
+    const v = document.getElementById('editInput').value.trim();
+    const g = document.getElementById('editGroup').value;
+    if (!v) { alert('⚠️ Please enter a question'); return; }
+    if (index === -1) { tempQuestions.push(v); tempQuestionGroups[tempQuestions.length-1] = g; }
+    else { tempQuestions[index] = v; tempQuestionGroups[index] = g; }
+    renderQuestions(); closeEditForm();
+};
+
+// ============================================
+// IMPORT / EXPORT / CLEAR
+// ============================================
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const config = {
+        version: '2.0',
+        timestamp: new Date().toISOString(),
+        pairs: tempPairs,
+        questions: tempQuestions.map((q, i) => ({ text: q, group: tempQuestionGroups[i] })),
+        customGroups: tempCustomGroups
+    };
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `trading_config_${new Date().toISOString().slice(0,10)}.json`;
+    link.href = url;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    addMessage('📤 Configuration exported!', true);
+});
+
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFileInput').click());
+
+document.getElementById('importFileInput').addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        try {
+            const config = JSON.parse(ev.target.result);
+            if (!config.pairs || !Array.isArray(config.pairs)) throw new Error('pairs missing');
+            if (!config.questions || !Array.isArray(config.questions)) throw new Error('questions missing');
+            tempPairs = config.pairs;
+            tempQuestions = []; tempQuestionGroups = {};
+            config.questions.forEach((q, i) => { tempQuestions.push(q.text); tempQuestionGroups[i] = q.group || 'bias'; });
+            if (config.customGroups) tempCustomGroups = config.customGroups;
+            renderSettings();
+            addMessage('📥 Configuration imported!', true);
+        } catch(err) { alert('❌ Invalid config file: ' + err.message); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+});
+
+document.getElementById('clearSessionsBtn').addEventListener('click', () => {
+    if (confirm('Clear ALL session history? This cannot be undone.')) {
+        clearAllSessions();
+        addMessage('🗑️ Session history cleared.', true);
+    }
+});
+
+// ============================================
+// INPUT HANDLERS
+// ============================================
+sendBtn.addEventListener('click', () => {
+    const value = messageInput.value.trim();
+    if (!value) return;
+    if (state.phase === 'setup') {
+        addMessage(value, false);
+        hideInput();
+        setTimeout(() => handleSetupInput(value), 300);
+    }
+});
+
+messageInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendBtn.click(); }
+});
+
+messageInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+});
+
+// Close modals on backdrop click
+settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) closeSettings(); });
+historyOverlay.addEventListener('click', e => { if (e.target === historyOverlay) historyOverlay.classList.remove('show'); });
+editModal.addEventListener('click', e => { if (e.target === editModal) closeEditForm(); });
+
+// ============================================
+// INIT
+// ============================================
+loadConfig();
+showWelcome();
+</script>
 </body>
 </html>
