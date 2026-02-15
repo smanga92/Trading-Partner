@@ -1602,16 +1602,19 @@ function generateSnapshot() {
 
 function createSnapshotCanvas() {
     // ── CONSTANTS ──────────────────────────────────────────────────────────
-    const PADDING       = 60;
-    const CELL_PAD_H    = 28;   // horizontal padding inside each cell (each side)
-    const CELL_PAD_V    = 20;   // vertical padding inside each cell (each side)
-    const HEADER_HEIGHT = 180;
-    const FOOTER_HEIGHT = 60;
-    const FONT_HEADER   = 'bold 15px monospace';   // column header text
-    const FONT_CELL     = 'bold 15px monospace';   // answer cell text
-    const FONT_PAIR     = '15px monospace';         // pair name text
-    const MIN_COL_W     = 160;  // minimum width for any answer column
-    const MIN_PAIR_W    = 130;  // minimum width for the pair column
+    const PADDING        = 60;
+    const CELL_PAD_H     = 24;    // horizontal padding inside each cell (left side only)
+    const CELL_PAD_V     = 14;    // vertical padding top+bottom inside each cell
+    const LINE_HEIGHT    = 19;    // px between lines when text wraps
+    const TEXT_HEIGHT    = 17;    // approximate cap height of 15px monospace
+    const HEADER_HEIGHT  = 180;
+    const FOOTER_HEIGHT  = 60;
+    const FONT_HEADER    = 'bold 15px monospace';
+    const FONT_CELL      = 'bold 15px monospace';
+    const FONT_PAIR      = '15px monospace';
+    const MIN_COL_W      = 120;   // minimum answer column width — wrapping handles the rest
+    const MIN_PAIR_W     = 110;
+    const MAX_WRAP_LINES = 2;     // never more than 2 lines per cell
 
     const COLORS = {
         bgPrimary:    '#0A0E27',
@@ -1627,42 +1630,56 @@ function createSnapshotCanvas() {
         standby:      '#FFB800'
     };
 
-    // ── ABBREVIATION MAP ───────────────────────────────────────────────────
-    const ABBREV = [
-        ['Bullish Strong','Bull. Strong'], ['Bullish Building','Bull. Bldg.'],
-        ['Bullish Fading','Bull. Fading'], ['Bullish Shifting','Bull. Shift.'],
-        ['Bullish Exhausted','Bull. Exh.'],
-        ['Bearish Strong','Bear. Strong'], ['Bearish Building','Bear. Bldg.'],
-        ['Bearish Fading','Bear. Fading'], ['Bearish Shifting','Bear. Shift.'],
-        ['Bearish Exhausted','Bear. Exh.'],
-        ['Int. Taken → Ext.','Int.→Ext.'],
-        ['Ext. Taken → Extending','Ext.→Ext.'],
-        ['Targeting Int.','Tgt. Int.'],
-        ['Targeting Ext.','Tgt. Ext.'],
-        ['Stand by for Buys','Stby Buys'],
-        ['Stand by for Sells','Stby Sells'],
-        ['No Clear Target','No Target'],
-        ['Int. & Ext. Mixed','Int/Ext Mix'],
-    ];
-
-    function abbreviate(text) {
-        let t = text;
-        for (const [f, r] of ABBREV) { if (t.includes(f)) { t = t.replace(f, r); break; } }
-        return t;
-    }
-
     function colorFor(answer) {
-        if (/📈|⬆️|▲|🔥|🌅|Bullish|Buy|HL\/HH|Above|Extending Up|Tgt\. Ext\. A/.test(answer)) return COLORS.buy;
-        if (/📉|⬇️|▼|❄️|🌑|Bearish|Sell|LH\/LL|Below|Extending Down/.test(answer)) return COLORS.sell;
-        if (/↔️|➡️|🔄|⚡|🌤️|🌥️|Sideways|Stand by|Stby|Choppy|Fading|Shift|Exh\.|Mixed|No Target|Tgt\. Int|Int\.→/.test(answer)) return COLORS.standby;
+        if (/📈|⬆️|▲|🔥|🌅|Bullish|Buy|HL\/HH|Ext\. Above|Extending Up|Tgt\. Ext\. A|→ Ext\. Above/.test(answer)) return COLORS.buy;
+        if (/📉|⬇️|▼|❄️|🌑|Bearish|Sell|LH\/LL|Ext\. Below|Extending Down|→ Ext\. Below/.test(answer)) return COLORS.sell;
+        if (/↔️|➡️|🔄|⚡|🌤️|🌥️|Sideways|Stand by|Choppy|Fading|Shifting|Exhausted|Mixed|No Clear|Targeting Int\./.test(answer)) return COLORS.standby;
         return COLORS.textSecondary;
     }
 
-    // ── PHASE 1: MEASURE — use a scratch canvas to get real text widths ────
+    // ── SCRATCH CANVAS for measuring ──────────────────────────────────────
     const scratch = document.createElement('canvas');
     const sCtx = scratch.getContext('2d');
 
-    // Measure pair column — widest of "PAIR" header or any pair name
+    // Split text into up to MAX_WRAP_LINES lines given a max pixel width
+    function wrapText(ctx, text, maxW) {
+        // First try fitting on one line
+        if (ctx.measureText(text).width <= maxW) return [text];
+
+        // Try to split on word boundaries
+        const words = text.split(' ');
+        const lines = [];
+        let current = '';
+
+        for (const word of words) {
+            const test = current ? current + ' ' + word : word;
+            if (ctx.measureText(test).width > maxW && current) {
+                lines.push(current);
+                current = word;
+                if (lines.length === MAX_WRAP_LINES) break;
+            } else {
+                current = test;
+            }
+        }
+        if (current && lines.length < MAX_WRAP_LINES) lines.push(current);
+
+        // If we still only have 1 line (single long word with no spaces), just return it — no hard truncation
+        return lines.length ? lines : [text];
+    }
+
+    // Height a cell needs given its text and column width
+    function cellHeight(ctx, font, text, colW) {
+        ctx.font = font;
+        const usableW = colW - CELL_PAD_H * 2;
+        const lines = wrapText(ctx, text, usableW);
+        const numLines = Math.min(lines.length, MAX_WRAP_LINES);
+        return CELL_PAD_V * 2 + TEXT_HEIGHT + (numLines - 1) * LINE_HEIGHT;
+    }
+
+    // ── PHASE 1: DETERMINE COLUMN WIDTHS ──────────────────────────────────
+    // Column width is based on fitting the HEADER in one line (headers shouldn't wrap)
+    // plus a comfortable minimum. Answer cells will wrap if needed within that width.
+
     sCtx.font = FONT_HEADER;
     let pairColW = sCtx.measureText('PAIR').width + CELL_PAD_H * 2;
     sCtx.font = FONT_PAIR;
@@ -1671,45 +1688,74 @@ function createSnapshotCanvas() {
     }
     pairColW = Math.max(pairColW, MIN_PAIR_W);
 
-    // Measure each question column — widest of header label or any answer in that column
-    const colWidths = state.questions.map((question, qIdx) => {
+    const colWidths = state.questions.map((question) => {
         const quoted = question.match(/"([^"]+)"/);
         const headerText = (quoted ? quoted[1] : question).toUpperCase();
-
         sCtx.font = FONT_HEADER;
-        let w = sCtx.measureText(headerText).width + CELL_PAD_H * 2;
-
-        sCtx.font = FONT_CELL;
-        for (const pair of state.pairs) {
-            const raw = (state.answers[pair] || [])[qIdx] || '';
-            const display = abbreviate(raw);
-            w = Math.max(w, sCtx.measureText(display).width + CELL_PAD_H * 2);
-        }
+        // Column wide enough for the header to fit on one line
+        const w = sCtx.measureText(headerText).width + CELL_PAD_H * 2;
         return Math.max(w, MIN_COL_W);
     });
 
-    // ── PHASE 2: CALCULATE TOTAL CANVAS SIZE ──────────────────────────────
-    const tableWidth  = pairColW + colWidths.reduce((s, w) => s + w, 0);
-    const rowHeight   = 40 + CELL_PAD_V * 2;  // text height ~20px + padding top+bottom
-    const tableHeight = rowHeight * (state.pairs.length + 1); // +1 for column header row
+    // ── PHASE 2: DETERMINE PER-ROW HEIGHTS ────────────────────────────────
+    // Each row's height = tallest cell in that row (pair name or any answer).
+    // The column header row height is determined by the tallest header.
 
-    // Canvas total width: table + padding on both sides, but at least wide enough for the title
-    const minWidthForTitle = 700;
-    const canvasWidth  = Math.max(tableWidth + PADDING * 2, minWidthForTitle);
+    // Header row height — headers fit in one line by design, but check just in case
+    let headerRowH = CELL_PAD_V * 2 + TEXT_HEIGHT; // default: 1-line height
+    state.questions.forEach((question, i) => {
+        const quoted = question.match(/"([^"]+)"/);
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+        const h = cellHeight(sCtx, FONT_HEADER, headerText, colWidths[i]);
+        headerRowH = Math.max(headerRowH, h);
+    });
+
+    // Data row heights
+    const rowHeights = state.pairs.map((pair) => {
+        // Height needed for the pair name cell
+        let maxH = cellHeight(sCtx, FONT_PAIR, pair, pairColW);
+        // Height needed for each answer cell
+        state.questions.forEach((_, qIdx) => {
+            const answer = (state.answers[pair] || [])[qIdx] || '';
+            const h = cellHeight(sCtx, FONT_CELL, answer, colWidths[qIdx]);
+            maxH = Math.max(maxH, h);
+        });
+        return maxH;
+    });
+
+    // ── PHASE 3: CANVAS SIZE ───────────────────────────────────────────────
+    const tableWidth  = pairColW + colWidths.reduce((s, w) => s + w, 0);
+    const tableHeight = headerRowH + rowHeights.reduce((s, h) => s + h, 0);
+
+    const canvasWidth  = Math.max(tableWidth + PADDING * 2, 700);
     const canvasHeight = PADDING + HEADER_HEIGHT + tableHeight + FOOTER_HEIGHT + PADDING;
 
-    // ── PHASE 3: DRAW ──────────────────────────────────────────────────────
+    // ── PHASE 4: DRAW ──────────────────────────────────────────────────────
     const canvas = document.createElement('canvas');
     canvas.width  = canvasWidth;
     canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
 
-    // Background
     ctx.fillStyle = COLORS.bgPrimary;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     let currentY = PADDING;
-    const tableX = Math.round((canvasWidth - tableWidth) / 2); // center the table
+    const tableX = Math.round((canvasWidth - tableWidth) / 2);
+
+    // Helper: draw wrapped text centred vertically in a cell of given height
+    function drawCellText(text, font, color, x, cellY, cellH, colW) {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.textAlign = 'left';
+        const usableW = colW - CELL_PAD_H * 2;
+        const lines = wrapText(ctx, text, usableW).slice(0, MAX_WRAP_LINES);
+        const blockH = TEXT_HEIGHT + (lines.length - 1) * LINE_HEIGHT;
+        // vertically centre the text block inside the cell
+        const startY = cellY + Math.round((cellH - blockH) / 2) + TEXT_HEIGHT;
+        lines.forEach((line, li) => {
+            ctx.fillText(line, x + CELL_PAD_H, startY + li * LINE_HEIGHT);
+        });
+    }
 
     // ── HEADER BANNER ──────────────────────────────────────────────────────
     ctx.fillStyle = COLORS.bgHeader;
@@ -1733,7 +1779,6 @@ function createSnapshotCanvas() {
     ctx.fillStyle = COLORS.accentPurple;
     ctx.fillRect(canvasWidth / 2 - 50, currentY + 118, 100, 2);
 
-    // Pair + column count info line
     ctx.fillStyle = COLORS.textSecondary;
     ctx.font = '13px monospace';
     ctx.fillText(
@@ -1745,84 +1790,68 @@ function createSnapshotCanvas() {
 
     // ── COLUMN HEADER ROW ──────────────────────────────────────────────────
     ctx.fillStyle = COLORS.bgHeader;
-    ctx.fillRect(tableX, currentY, tableWidth, rowHeight);
+    ctx.fillRect(tableX, currentY, tableWidth, headerRowH);
 
-    // Top border accent
     ctx.fillStyle = gradTop;
     ctx.fillRect(tableX, currentY, tableWidth, 2);
 
-    ctx.fillStyle = COLORS.accentCyan;
-    ctx.font = FONT_HEADER;
-    ctx.textAlign = 'left';
-
     let colX = tableX;
 
-    // "PAIR" header cell
-    ctx.fillText('PAIR', colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+    // "PAIR" header
+    drawCellText('PAIR', FONT_HEADER, COLORS.accentCyan, colX, currentY, headerRowH, pairColW);
     colX += pairColW;
 
-    // Draw vertical divider after pair column
     ctx.fillStyle = COLORS.border;
-    ctx.fillRect(colX, currentY + 10, 1, rowHeight - 20);
+    ctx.fillRect(colX, currentY + 8, 1, headerRowH - 16);
 
     state.questions.forEach((question, i) => {
         const quoted = question.match(/"([^"]+)"/);
         const headerText = (quoted ? quoted[1] : question).toUpperCase();
-        ctx.fillStyle = COLORS.accentCyan;
-        ctx.font = FONT_HEADER;
-        ctx.fillText(headerText, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+        drawCellText(headerText, FONT_HEADER, COLORS.accentCyan, colX, currentY, headerRowH, colWidths[i]);
         colX += colWidths[i];
         if (i < state.questions.length - 1) {
             ctx.fillStyle = COLORS.border;
-            ctx.fillRect(colX, currentY + 10, 1, rowHeight - 20);
+            ctx.fillRect(colX, currentY + 8, 1, headerRowH - 16);
         }
     });
 
-    // Bottom border of header row
     ctx.fillStyle = COLORS.border;
-    ctx.fillRect(tableX, currentY + rowHeight - 1, tableWidth, 1);
+    ctx.fillRect(tableX, currentY + headerRowH - 1, tableWidth, 1);
 
-    currentY += rowHeight;
+    currentY += headerRowH;
 
     // ── DATA ROWS ──────────────────────────────────────────────────────────
     state.pairs.forEach((pair, rowIdx) => {
-        // Alternating row background
+        const rowH = rowHeights[rowIdx];
+
         if (rowIdx % 2 === 0) {
             ctx.fillStyle = COLORS.bgRowAlt;
-            ctx.fillRect(tableX, currentY, tableWidth, rowHeight);
+            ctx.fillRect(tableX, currentY, tableWidth, rowH);
         }
 
         colX = tableX;
 
-        // Pair name cell
-        ctx.fillStyle = COLORS.textPrimary;
-        ctx.font = FONT_PAIR;
-        ctx.textAlign = 'left';
-        ctx.fillText(pair, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+        // Pair name
+        drawCellText(pair, FONT_PAIR, COLORS.textPrimary, colX, currentY, rowH, pairColW);
         colX += pairColW;
 
-        // Divider after pair
         ctx.fillStyle = COLORS.border;
-        ctx.fillRect(colX, currentY + 8, 1, rowHeight - 16);
+        ctx.fillRect(colX, currentY + 8, 1, rowH - 16);
 
         // Answer cells
         (state.answers[pair] || []).forEach((answer, ansIdx) => {
-            const display = abbreviate(answer);
-            ctx.fillStyle = colorFor(answer);
-            ctx.font = FONT_CELL;
-            ctx.fillText(display, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+            drawCellText(answer, FONT_CELL, colorFor(answer), colX, currentY, rowH, colWidths[ansIdx]);
             colX += colWidths[ansIdx];
             if (ansIdx < state.questions.length - 1) {
                 ctx.fillStyle = COLORS.border;
-                ctx.fillRect(colX, currentY + 8, 1, rowHeight - 16);
+                ctx.fillRect(colX, currentY + 8, 1, rowH - 16);
             }
         });
 
-        // Row bottom border
         ctx.fillStyle = COLORS.border;
-        ctx.fillRect(tableX, currentY + rowHeight - 1, tableWidth, 1);
+        ctx.fillRect(tableX, currentY + rowH - 1, tableWidth, 1);
 
-        currentY += rowHeight;
+        currentY += rowH;
     });
 
     // Outer table border
