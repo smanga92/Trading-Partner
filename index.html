@@ -1601,86 +1601,250 @@ function generateSnapshot() {
 }
 
 function createSnapshotCanvas() {
+    // ── CONSTANTS ──────────────────────────────────────────────────────────
+    const PADDING       = 60;
+    const CELL_PAD_H    = 28;   // horizontal padding inside each cell (each side)
+    const CELL_PAD_V    = 20;   // vertical padding inside each cell (each side)
+    const HEADER_HEIGHT = 180;
+    const FOOTER_HEIGHT = 60;
+    const FONT_HEADER   = 'bold 15px monospace';   // column header text
+    const FONT_CELL     = 'bold 15px monospace';   // answer cell text
+    const FONT_PAIR     = '15px monospace';         // pair name text
+    const MIN_COL_W     = 160;  // minimum width for any answer column
+    const MIN_PAIR_W    = 130;  // minimum width for the pair column
+
+    const COLORS = {
+        bgPrimary:    '#0A0E27',
+        bgHeader:     '#1A1F3A',
+        bgRowAlt:     '#111628',
+        accentCyan:   '#00D9FF',
+        accentPurple: '#7B61FF',
+        textPrimary:  '#FFFFFF',
+        textSecondary:'#B8C5D6',
+        border:       '#2D3548',
+        buy:          '#00FF94',
+        sell:         '#FF4757',
+        standby:      '#FFB800'
+    };
+
+    // ── ABBREVIATION MAP ───────────────────────────────────────────────────
+    const ABBREV = [
+        ['Bullish Strong','Bull. Strong'], ['Bullish Building','Bull. Bldg.'],
+        ['Bullish Fading','Bull. Fading'], ['Bullish Shifting','Bull. Shift.'],
+        ['Bullish Exhausted','Bull. Exh.'],
+        ['Bearish Strong','Bear. Strong'], ['Bearish Building','Bear. Bldg.'],
+        ['Bearish Fading','Bear. Fading'], ['Bearish Shifting','Bear. Shift.'],
+        ['Bearish Exhausted','Bear. Exh.'],
+        ['Int. Taken → Ext.','Int.→Ext.'],
+        ['Ext. Taken → Extending','Ext.→Ext.'],
+        ['Targeting Int.','Tgt. Int.'],
+        ['Targeting Ext.','Tgt. Ext.'],
+        ['Stand by for Buys','Stby Buys'],
+        ['Stand by for Sells','Stby Sells'],
+        ['No Clear Target','No Target'],
+        ['Int. & Ext. Mixed','Int/Ext Mix'],
+    ];
+
+    function abbreviate(text) {
+        let t = text;
+        for (const [f, r] of ABBREV) { if (t.includes(f)) { t = t.replace(f, r); break; } }
+        return t;
+    }
+
+    function colorFor(answer) {
+        if (/📈|⬆️|▲|🔥|🌅|Bullish|Buy|HL\/HH|Above|Extending Up|Tgt\. Ext\. A/.test(answer)) return COLORS.buy;
+        if (/📉|⬇️|▼|❄️|🌑|Bearish|Sell|LH\/LL|Below|Extending Down/.test(answer)) return COLORS.sell;
+        if (/↔️|➡️|🔄|⚡|🌤️|🌥️|Sideways|Stand by|Stby|Choppy|Fading|Shift|Exh\.|Mixed|No Target|Tgt\. Int|Int\.→/.test(answer)) return COLORS.standby;
+        return COLORS.textSecondary;
+    }
+
+    // ── PHASE 1: MEASURE — use a scratch canvas to get real text widths ────
+    const scratch = document.createElement('canvas');
+    const sCtx = scratch.getContext('2d');
+
+    // Measure pair column — widest of "PAIR" header or any pair name
+    sCtx.font = FONT_HEADER;
+    let pairColW = sCtx.measureText('PAIR').width + CELL_PAD_H * 2;
+    sCtx.font = FONT_PAIR;
+    for (const pair of state.pairs) {
+        pairColW = Math.max(pairColW, sCtx.measureText(pair).width + CELL_PAD_H * 2);
+    }
+    pairColW = Math.max(pairColW, MIN_PAIR_W);
+
+    // Measure each question column — widest of header label or any answer in that column
+    const colWidths = state.questions.map((question, qIdx) => {
+        const quoted = question.match(/"([^"]+)"/);
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+
+        sCtx.font = FONT_HEADER;
+        let w = sCtx.measureText(headerText).width + CELL_PAD_H * 2;
+
+        sCtx.font = FONT_CELL;
+        for (const pair of state.pairs) {
+            const raw = (state.answers[pair] || [])[qIdx] || '';
+            const display = abbreviate(raw);
+            w = Math.max(w, sCtx.measureText(display).width + CELL_PAD_H * 2);
+        }
+        return Math.max(w, MIN_COL_W);
+    });
+
+    // ── PHASE 2: CALCULATE TOTAL CANVAS SIZE ──────────────────────────────
+    const tableWidth  = pairColW + colWidths.reduce((s, w) => s + w, 0);
+    const rowHeight   = 40 + CELL_PAD_V * 2;  // text height ~20px + padding top+bottom
+    const tableHeight = rowHeight * (state.pairs.length + 1); // +1 for column header row
+
+    // Canvas total width: table + padding on both sides, but at least wide enough for the title
+    const minWidthForTitle = 700;
+    const canvasWidth  = Math.max(tableWidth + PADDING * 2, minWidthForTitle);
+    const canvasHeight = PADDING + HEADER_HEIGHT + tableHeight + FOOTER_HEIGHT + PADDING;
+
+    // ── PHASE 3: DRAW ──────────────────────────────────────────────────────
     const canvas = document.createElement('canvas');
+    canvas.width  = canvasWidth;
+    canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
-    const width = 1200, padding = 60, headerHeight = 180, rowHeight = 70, footerHeight = 50;
-    const numRows = state.pairs.length;
-    const height = headerHeight + (numRows * rowHeight) + footerHeight + (padding * 2);
-    canvas.width = width; canvas.height = height;
 
-    const bgPrimary='#0A0E27', bgHeader='#1A1F3A', accentCyan='#00D9FF', accentPurple='#7B61FF';
-    const textPrimary='#FFFFFF', textSecondary='#B8C5D6', border='#2D3548', rowAlt='#111628';
-    const verdictBuy='#00FF94', verdictSell='#FF4757', verdictStandby='#FFB800';
+    // Background
+    ctx.fillStyle = COLORS.bgPrimary;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    ctx.fillStyle = bgPrimary; ctx.fillRect(0, 0, width, height);
-    let currentY = padding;
+    let currentY = PADDING;
+    const tableX = Math.round((canvasWidth - tableWidth) / 2); // center the table
 
-    // Header
-    ctx.fillStyle = bgHeader; ctx.fillRect(padding, currentY, width - padding*2, headerHeight);
-    const gradTop = ctx.createLinearGradient(padding,0,width-padding,0);
-    gradTop.addColorStop(0, accentCyan); gradTop.addColorStop(1, accentPurple);
-    ctx.fillStyle = gradTop; ctx.fillRect(padding, currentY, width-padding*2, 4);
-    ctx.fillStyle = textPrimary; ctx.font = 'bold 36px serif'; ctx.textAlign = 'center';
-    ctx.fillText('TRADING PLAN SNAPSHOT', width/2, currentY+60);
-    ctx.fillStyle = accentCyan; ctx.font = '18px monospace';
-    ctx.fillText(state.timestamp, width/2, currentY+100);
-    ctx.fillStyle = accentPurple; ctx.fillRect(width/2-50, currentY+120, 100, 2);
-    currentY += headerHeight;
+    // ── HEADER BANNER ──────────────────────────────────────────────────────
+    ctx.fillStyle = COLORS.bgHeader;
+    ctx.fillRect(tableX, currentY, tableWidth, HEADER_HEIGHT);
 
-    // Table Header
-    const pairColWidth = 180;
-    const questionColWidth = (width - padding*2 - pairColWidth) / state.questions.length;
-    ctx.fillStyle = bgHeader; ctx.fillRect(padding, currentY, width-padding*2, rowHeight);
-    ctx.fillStyle = accentCyan; ctx.font = 'bold 16px monospace'; ctx.textAlign = 'left';
-    let colX = padding + 20;
-    ctx.fillText('PAIR', colX, currentY + rowHeight/2 + 6); colX += pairColWidth;
+    const gradTop = ctx.createLinearGradient(tableX, 0, tableX + tableWidth, 0);
+    gradTop.addColorStop(0, COLORS.accentCyan);
+    gradTop.addColorStop(1, COLORS.accentPurple);
+    ctx.fillStyle = gradTop;
+    ctx.fillRect(tableX, currentY, tableWidth, 4);
+
+    ctx.fillStyle = COLORS.textPrimary;
+    ctx.font = 'bold 34px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TRADING PLAN SNAPSHOT', canvasWidth / 2, currentY + 60);
+
+    ctx.fillStyle = COLORS.accentCyan;
+    ctx.font = '17px monospace';
+    ctx.fillText(state.timestamp, canvasWidth / 2, currentY + 100);
+
+    ctx.fillStyle = COLORS.accentPurple;
+    ctx.fillRect(canvasWidth / 2 - 50, currentY + 118, 100, 2);
+
+    // Pair + column count info line
+    ctx.fillStyle = COLORS.textSecondary;
+    ctx.font = '13px monospace';
+    ctx.fillText(
+        `${state.pairs.length} pair${state.pairs.length !== 1 ? 's' : ''} · ${state.questions.length} factor${state.questions.length !== 1 ? 's' : ''}`,
+        canvasWidth / 2, currentY + 145
+    );
+
+    currentY += HEADER_HEIGHT;
+
+    // ── COLUMN HEADER ROW ──────────────────────────────────────────────────
+    ctx.fillStyle = COLORS.bgHeader;
+    ctx.fillRect(tableX, currentY, tableWidth, rowHeight);
+
+    // Top border accent
+    ctx.fillStyle = gradTop;
+    ctx.fillRect(tableX, currentY, tableWidth, 2);
+
+    ctx.fillStyle = COLORS.accentCyan;
+    ctx.font = FONT_HEADER;
+    ctx.textAlign = 'left';
+
+    let colX = tableX;
+
+    // "PAIR" header cell
+    ctx.fillText('PAIR', colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+    colX += pairColW;
+
+    // Draw vertical divider after pair column
+    ctx.fillStyle = COLORS.border;
+    ctx.fillRect(colX, currentY + 10, 1, rowHeight - 20);
+
     state.questions.forEach((question, i) => {
         const quoted = question.match(/"([^"]+)"/);
-        const text = (quoted ? quoted[1] : question).toUpperCase();
-        const maxW = questionColWidth - 40;
-        const words = text.split(' '); let lines = [], cur = '';
-        words.forEach(w => { const t = cur + (cur?' ':'') + w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
-        if (cur) lines.push(cur);
-        if (lines.length === 1) { ctx.fillText(lines[0], colX, currentY+rowHeight/2+6); }
-        else { const sh = 18, sy = currentY+(rowHeight-lines.length*sh)/2+6; lines.slice(0,2).forEach((l,idx)=>ctx.fillText(l,colX,sy+idx*sh)); }
-        if (i < state.questions.length-1) { ctx.fillStyle=border; ctx.fillRect(colX-10,currentY+15,2,rowHeight-30); ctx.fillStyle=accentCyan; }
-        colX += questionColWidth;
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+        ctx.fillStyle = COLORS.accentCyan;
+        ctx.font = FONT_HEADER;
+        ctx.fillText(headerText, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+        colX += colWidths[i];
+        if (i < state.questions.length - 1) {
+            ctx.fillStyle = COLORS.border;
+            ctx.fillRect(colX, currentY + 10, 1, rowHeight - 20);
+        }
     });
+
+    // Bottom border of header row
+    ctx.fillStyle = COLORS.border;
+    ctx.fillRect(tableX, currentY + rowHeight - 1, tableWidth, 1);
+
     currentY += rowHeight;
 
-    // Rows
+    // ── DATA ROWS ──────────────────────────────────────────────────────────
     state.pairs.forEach((pair, rowIdx) => {
-        if (rowIdx%2===0) { ctx.fillStyle=rowAlt; ctx.fillRect(padding,currentY,width-padding*2,rowHeight); }
-        ctx.fillStyle=border; ctx.fillRect(padding,currentY,width-padding*2,1);
-        colX = padding+20;
-        ctx.fillStyle=textPrimary; ctx.font='15px monospace'; ctx.textAlign='left';
-        ctx.fillText(pair, colX, currentY+rowHeight/2+6); colX += pairColWidth;
-        (state.answers[pair]||[]).forEach((answer, ansIdx) => {
-            let d = answer;
-            const abbrev = [['Bullish Strong','Bull. Strong'],['Bullish Building','Bull. Building'],['Bullish Fading','Bull. Fading'],['Bullish Shifting','Bull. Shifting'],['Bullish Exhausted','Bull. Exhaust.'],['Bearish Strong','Bear. Strong'],['Bearish Building','Bear. Building'],['Bearish Fading','Bear. Fading'],['Bearish Shifting','Bear. Shifting'],['Bearish Exhausted','Bear. Exhaust.']];
-            abbrev.forEach(([f,t]) => { if (d.includes(f)) d = d.replace(f,t); });
-            let color = textSecondary;
-            if (answer.includes('📈')||answer.includes('⬆️')||answer.includes('▲')||answer.includes('🔥')||answer.includes('🌅')||answer.includes('Bullish')||answer.includes('Buy')||answer.includes('HL/HH')) color=verdictBuy;
-            else if (answer.includes('📉')||answer.includes('⬇️')||answer.includes('▼')||answer.includes('❄️')||answer.includes('🌑')||answer.includes('Bearish')||answer.includes('Sell')||answer.includes('LH/LL')) color=verdictSell;
-            else if (answer.includes('↔️')||answer.includes('➡️')||answer.includes('🔄')||answer.includes('⚡')||answer.includes('🌤️')||answer.includes('🌥️')||answer.includes('Sideways')||answer.includes('Stand by')||answer.includes('Choppy')||answer.includes('Fading')||answer.includes('Shifting')||answer.includes('Exhausted')) color=verdictStandby;
-            ctx.fillStyle=color; ctx.font='bold 15px monospace';
-            const mw = questionColWidth-40;
-            while(ctx.measureText(d+'...').width>mw && d.length>0) d=d.slice(0,-1);
-            if(d !== answer) d+='...';
-            ctx.fillText(d, colX, currentY+rowHeight/2+6);
-            if (ansIdx<state.questions.length-1) { ctx.fillStyle=border; ctx.fillRect(colX-10,currentY+15,2,rowHeight-30); }
-            colX += questionColWidth;
+        // Alternating row background
+        if (rowIdx % 2 === 0) {
+            ctx.fillStyle = COLORS.bgRowAlt;
+            ctx.fillRect(tableX, currentY, tableWidth, rowHeight);
+        }
+
+        colX = tableX;
+
+        // Pair name cell
+        ctx.fillStyle = COLORS.textPrimary;
+        ctx.font = FONT_PAIR;
+        ctx.textAlign = 'left';
+        ctx.fillText(pair, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+        colX += pairColW;
+
+        // Divider after pair
+        ctx.fillStyle = COLORS.border;
+        ctx.fillRect(colX, currentY + 8, 1, rowHeight - 16);
+
+        // Answer cells
+        (state.answers[pair] || []).forEach((answer, ansIdx) => {
+            const display = abbreviate(answer);
+            ctx.fillStyle = colorFor(answer);
+            ctx.font = FONT_CELL;
+            ctx.fillText(display, colX + CELL_PAD_H, currentY + rowHeight / 2 + 6);
+            colX += colWidths[ansIdx];
+            if (ansIdx < state.questions.length - 1) {
+                ctx.fillStyle = COLORS.border;
+                ctx.fillRect(colX, currentY + 8, 1, rowHeight - 16);
+            }
         });
+
+        // Row bottom border
+        ctx.fillStyle = COLORS.border;
+        ctx.fillRect(tableX, currentY + rowHeight - 1, tableWidth, 1);
+
         currentY += rowHeight;
     });
 
-    // Footer
-    const gradBot = ctx.createLinearGradient(padding,0,width-padding,0);
-    gradBot.addColorStop(0,accentCyan); gradBot.addColorStop(1,accentPurple);
-    ctx.fillStyle=gradBot; ctx.fillRect(padding,currentY,width-padding*2,2);
-    currentY+=30;
-    ctx.fillStyle=textSecondary; ctx.font='14px monospace'; ctx.textAlign='center';
-    ctx.fillText('Trade with discipline. Protect your capital. Trust your process.', width/2, currentY);
+    // Outer table border
+    ctx.strokeStyle = COLORS.border;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(tableX, PADDING + HEADER_HEIGHT, tableWidth, tableHeight);
+
+    // ── FOOTER ─────────────────────────────────────────────────────────────
+    const gradBot = ctx.createLinearGradient(tableX, 0, tableX + tableWidth, 0);
+    gradBot.addColorStop(0, COLORS.accentCyan);
+    gradBot.addColorStop(1, COLORS.accentPurple);
+    ctx.fillStyle = gradBot;
+    ctx.fillRect(tableX, currentY + 10, tableWidth, 2);
+
+    ctx.fillStyle = COLORS.textSecondary;
+    ctx.font = '13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+        'Trade with discipline. Protect your capital. Trust your process.',
+        canvasWidth / 2, currentY + 38
+    );
+
     return canvas;
 }
 
