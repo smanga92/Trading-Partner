@@ -2354,7 +2354,7 @@ function showEditForm(type, index, value, groupKey = null) {
             <div class="edit-form-title">${index===-1?'Add':'Edit'} Question</div>
             <div class="form-group">
                 <label class="form-label">Question Text</label>
-                <input type="text" class="form-input" id="editInput" value="${value}" placeholder='e.g., What is your "Daily Bias"?'>
+                <textarea class="form-input" id="editInput" rows="3" placeholder='e.g., What is your "Daily Bias"?' style="resize:vertical;min-height:72px;"></textarea>
                 <div class="form-hint">Use "quotes" to set the snapshot column header</div>
             </div>
             <div class="form-group">
@@ -2366,6 +2366,8 @@ function showEditForm(type, index, value, groupKey = null) {
                 <button class="form-btn save" onclick="saveQuestionEdit(${index})">Save</button>
             </div>
         `;
+        // Set value via JS — never via HTML attribute — so no character can truncate it
+        document.getElementById('editInput').value = value;
     }
     editModal.classList.add('show');
     setTimeout(() => document.getElementById('editInput') && document.getElementById('editInput').focus(), 100);
