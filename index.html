@@ -1062,6 +1062,7 @@ const state = {
     questionCount: 0,
     currentQuestionSetup: 0,
     answerHistory: [],
+    pinnedAnswerHistory: [], // track pinned answers for back button support
     sessions: []
 };
 
@@ -1326,8 +1327,11 @@ function showWelcome() {
         const buttons = [
             { text: '▶ Start Session', class: 'btn-primary', action: startSession }
         ];
+        if (hasPinned && pinnedSet) {
+            buttons.push({ text: '📌 View Pinned', class: 'btn-verdict', action: viewPinnedSnapshot });
+        }
         if (hasPinned) {
-            buttons.push({ text: `📌 Update Pinned (${pinnedCount})`, class: 'btn-verdict', action: startPinnedUpdate });
+            buttons.push({ text: `✏️ Update Pinned (${pinnedCount})`, class: 'btn-verdict', action: startPinnedUpdate });
         }
         buttons.push({ text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup });
 
@@ -1485,13 +1489,55 @@ function finishSetup() {
 }
 
 // ============================================
+// VIEW PINNED SNAPSHOT (anytime, from home)
+// ============================================
+function viewPinnedSnapshot() {
+    clearChat();
+    addMessage('📌 Loading your pinned answers...', true);
+    showLoading();
+    setTimeout(() => {
+        hideLoading();
+        const canvas = createPinnedSnapshotCanvas();
+        const dataURL = canvas.toDataURL('image/png');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message message-bot';
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-label">Trading Partner</div>
+                <div class="message-bubble">
+                    📌 Your Pinned Answers
+                    <div class="snapshot-container">
+                        <img src="${dataURL}" class="snapshot-image" id="pinnedViewImg" alt="Pinned Answers">
+                        <div class="snapshot-actions">
+                            <button class="btn btn-primary" id="downloadPinnedViewBtn">💾 Download</button>
+                            <button class="btn btn-verdict" id="updateFromViewBtn">✏️ Update Pinned</button>
+                            <button class="btn btn-verdict" id="startFromViewBtn">▶ Start Session</button>
+                            <button class="btn btn-verdict" id="homeFromViewBtn">← Home</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        const anchor = document.getElementById('scrollAnchor');
+        chatContainer.insertBefore(messageDiv, anchor);
+        scrollToAnchor();
+
+        document.getElementById('pinnedViewImg').onclick = () => viewFullscreen(dataURL);
+        document.getElementById('downloadPinnedViewBtn').onclick = () => downloadSnapshot(dataURL);
+        document.getElementById('updateFromViewBtn').onclick = startPinnedUpdate;
+        document.getElementById('startFromViewBtn').onclick = startSession;
+        document.getElementById('homeFromViewBtn').onclick = showWelcome;
+    }, 500);
+}
+
+// ============================================
 // PINNED ANSWERS UPDATE FLOW
 // ============================================
 function startPinnedUpdate() {
     state.phase = 'pinned-update';
     state.currentPairIndex = 0;
     state.currentQuestionIndex = 0;
-    // Find first pinned question index
+    state.pinnedAnswerHistory = []; // reset back-button history
     const firstPinned = state.questions.findIndex((_, i) => state.questionPinned[i]);
     if (firstPinned === -1) { addMessage('No pinned questions found.', true); return; }
 
@@ -1548,7 +1594,17 @@ function askNextPinnedQuestion() {
 
 function handlePinnedAnswer(answer, qIdx) {
     const pair = state.pairs[state.currentPairIndex];
+
+    // Save to history BEFORE writing — so back can undo it
     const pinnedAnswers = loadPinnedAnswers();
+    const previousAnswer = (pinnedAnswers[qIdx] || {})[pair] || null;
+    state.pinnedAnswerHistory.push({
+        pairIndex: state.currentPairIndex,
+        questionIndex: qIdx,
+        previousAnswer // what was there before, so back can restore it
+    });
+
+    // Write new answer
     if (!pinnedAnswers[qIdx]) pinnedAnswers[qIdx] = {};
     pinnedAnswers[qIdx][pair] = answer;
     savePinnedAnswers(pinnedAnswers);
@@ -1564,16 +1620,72 @@ function handlePinnedAnswer(answer, qIdx) {
     setTimeout(askNextPinnedQuestion, 300);
 }
 
+function goBackOnePinnedQuestion() {
+    if (state.pinnedAnswerHistory.length === 0) return;
+
+    const last = state.pinnedAnswerHistory.pop();
+
+    // Restore previous answer (or remove if there was none)
+    const pinnedAnswers = loadPinnedAnswers();
+    if (last.previousAnswer === null) {
+        // There was no answer before — remove it
+        if (pinnedAnswers[last.questionIndex]) {
+            delete pinnedAnswers[last.questionIndex][state.pairs[last.pairIndex]];
+        }
+    } else {
+        if (!pinnedAnswers[last.questionIndex]) pinnedAnswers[last.questionIndex] = {};
+        pinnedAnswers[last.questionIndex][state.pairs[last.pairIndex]] = last.previousAnswer;
+    }
+    savePinnedAnswers(pinnedAnswers);
+
+    // Restore position
+    state.currentPairIndex = last.pairIndex;
+    state.currentQuestionIndex = last.questionIndex;
+
+    // Remove last 2 chat messages (user answer + question bubble)
+    const messages = chatContainer.querySelectorAll('.message');
+    if (messages.length >= 1) messages[messages.length - 1].remove();
+    if (messages.length >= 2) messages[messages.length - 2].remove();
+
+    setTimeout(() => askNextPinnedQuestion(), 100);
+}
+
 function finishPinnedUpdate() {
     backBtn.classList.remove('show');
     state.phase = 'welcome-back';
-    addMessage('✅ Pinned answers updated! They will be carried into every session automatically.', true);
+    addMessage('✅ Pinned answers updated!\n\nThey will be carried into every session automatically.', true);
+    showLoading();
     setTimeout(() => {
-        addMessage('Ready to start your session?', true, [
-            { text: '▶ Start Session', class: 'btn-primary', action: startSession },
-            { text: '← Back to Home', class: 'btn-verdict', action: showWelcome }
-        ]);
-    }, 400);
+        hideLoading();
+        const canvas = createPinnedSnapshotCanvas();
+        const dataURL = canvas.toDataURL('image/png');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message message-bot';
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-label">Trading Partner</div>
+                <div class="message-bubble">
+                    📌 Pinned Answers Snapshot
+                    <div class="snapshot-container">
+                        <img src="${dataURL}" class="snapshot-image" id="pinnedSnapshotImg" alt="Pinned Answers">
+                        <div class="snapshot-actions">
+                            <button class="btn btn-primary" id="downloadPinnedBtn">💾 Download</button>
+                            <button class="btn btn-verdict" id="startSessionFromPinnedBtn">▶ Start Session</button>
+                            <button class="btn btn-verdict" id="homeFromPinnedBtn">← Home</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        const anchor = document.getElementById('scrollAnchor');
+        chatContainer.insertBefore(messageDiv, anchor);
+        scrollToAnchor();
+
+        document.getElementById('downloadPinnedBtn').onclick = () => downloadSnapshot(dataURL);
+        document.getElementById('startSessionFromPinnedBtn').onclick = startSession;
+        document.getElementById('homeFromPinnedBtn').onclick = showWelcome;
+        document.getElementById('pinnedSnapshotImg').onclick = () => viewFullscreen(dataURL);
+    }, 800);
 }
 
 // ============================================
@@ -1690,6 +1802,10 @@ function handleAnswer(answer) {
 
 // Back one question
 backBtn.addEventListener('click', () => {
+    if (state.phase === 'pinned-update') {
+        goBackOnePinnedQuestion();
+        return;
+    }
     if (state.phase !== 'session' || state.answerHistory.length === 0) return;
     const last = state.answerHistory.pop();
     const pair = state.pairs[last.pairIndex];
@@ -2023,6 +2139,241 @@ function createSnapshotCanvas() {
         'Trade with discipline. Protect your capital. Trust your process.',
         canvasWidth / 2, currentY + 38
     );
+
+    return canvas;
+}
+
+function createPinnedSnapshotCanvas() {
+    // Only the pinned questions
+    const pinnedIndices = state.questions.map((_, i) => i).filter(i => state.questionPinned[i]);
+    const pinnedQuestions = pinnedIndices.map(i => state.questions[i]);
+    const pinnedAnswers = loadPinnedAnswers();
+
+    // ── CONSTANTS (same as main snapshot) ─────────────────────────────────
+    const PADDING        = 60;
+    const CELL_PAD_H     = 24;
+    const CELL_PAD_V     = 14;
+    const LINE_HEIGHT    = 19;
+    const TEXT_HEIGHT    = 17;
+    const HEADER_HEIGHT  = 180;
+    const FOOTER_HEIGHT  = 60;
+    const FONT_HEADER    = 'bold 15px monospace';
+    const FONT_CELL      = 'bold 15px monospace';
+    const FONT_PAIR      = '15px monospace';
+    const MIN_COL_W      = 120;
+    const MIN_PAIR_W     = 110;
+    const MAX_WRAP_LINES = 2;
+
+    const COLORS = {
+        bgPrimary:    '#0A0E27',
+        bgHeader:     '#1A1F3A',
+        bgRowAlt:     '#111628',
+        accentCyan:   '#00D9FF',
+        accentPurple: '#7B61FF',
+        textPrimary:  '#FFFFFF',
+        textSecondary:'#B8C5D6',
+        border:       '#2D3548',
+        buy:          '#00FF94',
+        sell:         '#FF4757',
+        standby:      '#FFB800'
+    };
+
+    function colorFor(answer) {
+        if (/📈|⬆️|▲|🔥|🌅|Bullish|Buy|HL\/HH|Ext\. Above|Extending Up|→ Ext\. Above/.test(answer)) return COLORS.buy;
+        if (/📉|⬇️|▼|❄️|🌑|Bearish|Sell|LH\/LL|Ext\. Below|Extending Down|→ Ext\. Below/.test(answer)) return COLORS.sell;
+        if (/↔️|➡️|🔄|⚡|🌤️|🌥️|Sideways|Stand by|Choppy|Fading|Shifting|Exhausted|Mixed|No Clear|Targeting Int\./.test(answer)) return COLORS.standby;
+        return COLORS.textSecondary;
+    }
+
+    const scratch = document.createElement('canvas');
+    const sCtx = scratch.getContext('2d');
+
+    function wrapText(ctx, text, maxW) {
+        if (ctx.measureText(text).width <= maxW) return [text];
+        const words = text.split(' ');
+        const lines = [];
+        let current = '';
+        for (const word of words) {
+            const test = current ? current + ' ' + word : word;
+            if (ctx.measureText(test).width > maxW && current) {
+                lines.push(current);
+                current = word;
+                if (lines.length === MAX_WRAP_LINES) break;
+            } else { current = test; }
+        }
+        if (current && lines.length < MAX_WRAP_LINES) lines.push(current);
+        return lines.length ? lines : [text];
+    }
+
+    function cellHeight(ctx, font, text, colW) {
+        ctx.font = font;
+        const usableW = colW - CELL_PAD_H * 2;
+        const lines = wrapText(ctx, text, usableW);
+        const numLines = Math.min(lines.length, MAX_WRAP_LINES);
+        return CELL_PAD_V * 2 + TEXT_HEIGHT + (numLines - 1) * LINE_HEIGHT;
+    }
+
+    // ── MEASURE ────────────────────────────────────────────────────────────
+    sCtx.font = FONT_HEADER;
+    let pairColW = sCtx.measureText('PAIR').width + CELL_PAD_H * 2;
+    sCtx.font = FONT_PAIR;
+    for (const pair of state.pairs) {
+        pairColW = Math.max(pairColW, sCtx.measureText(pair).width + CELL_PAD_H * 2);
+    }
+    pairColW = Math.max(pairColW, MIN_PAIR_W);
+
+    const colWidths = pinnedIndices.map((qIdx) => {
+        const question = state.questions[qIdx];
+        const quoted = question.match(/"([^"]+)"/);
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+        sCtx.font = FONT_HEADER;
+        const w = sCtx.measureText(headerText).width + CELL_PAD_H * 2;
+        return Math.max(w, MIN_COL_W);
+    });
+
+    let headerRowH = CELL_PAD_V * 2 + TEXT_HEIGHT;
+    pinnedIndices.forEach((qIdx, colPos) => {
+        const question = state.questions[qIdx];
+        const quoted = question.match(/"([^"]+)"/);
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+        headerRowH = Math.max(headerRowH, cellHeight(sCtx, FONT_HEADER, headerText, colWidths[colPos]));
+    });
+
+    const rowHeights = state.pairs.map((pair) => {
+        let maxH = cellHeight(sCtx, FONT_PAIR, pair, pairColW);
+        pinnedIndices.forEach((qIdx, colPos) => {
+            const answer = (pinnedAnswers[qIdx] || {})[pair] || '—';
+            maxH = Math.max(maxH, cellHeight(sCtx, FONT_CELL, answer, colWidths[colPos]));
+        });
+        return maxH;
+    });
+
+    // ── CANVAS SIZE ────────────────────────────────────────────────────────
+    const tableWidth  = pairColW + colWidths.reduce((s, w) => s + w, 0);
+    const tableHeight = headerRowH + rowHeights.reduce((s, h) => s + h, 0);
+    const canvasWidth  = Math.max(tableWidth + PADDING * 2, 700);
+    const canvasHeight = PADDING + HEADER_HEIGHT + tableHeight + FOOTER_HEIGHT + PADDING;
+
+    // ── DRAW ───────────────────────────────────────────────────────────────
+    const canvas = document.createElement('canvas');
+    canvas.width  = canvasWidth;
+    canvas.height = canvasHeight;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = COLORS.bgPrimary;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    let currentY = PADDING;
+    const tableX = Math.round((canvasWidth - tableWidth) / 2);
+
+    function drawCellText(text, font, color, x, cellY, cellH, colW) {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.textAlign = 'left';
+        const usableW = colW - CELL_PAD_H * 2;
+        const lines = wrapText(ctx, text, usableW).slice(0, MAX_WRAP_LINES);
+        const blockH = TEXT_HEIGHT + (lines.length - 1) * LINE_HEIGHT;
+        const startY = cellY + Math.round((cellH - blockH) / 2) + TEXT_HEIGHT;
+        lines.forEach((line, li) => ctx.fillText(line, x + CELL_PAD_H, startY + li * LINE_HEIGHT));
+    }
+
+    // Header banner
+    ctx.fillStyle = COLORS.bgHeader;
+    ctx.fillRect(tableX, currentY, tableWidth, HEADER_HEIGHT);
+    const grad = ctx.createLinearGradient(tableX, 0, tableX + tableWidth, 0);
+    grad.addColorStop(0, COLORS.accentCyan);
+    grad.addColorStop(1, COLORS.accentPurple);
+    ctx.fillStyle = grad;
+    ctx.fillRect(tableX, currentY, tableWidth, 4);
+    ctx.fillStyle = COLORS.textPrimary;
+    ctx.font = 'bold 34px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PINNED ANSWERS', canvasWidth / 2, currentY + 60);
+    ctx.fillStyle = COLORS.accentCyan;
+    ctx.font = '17px monospace';
+    const now = new Date();
+    ctx.fillText(now.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }), canvasWidth / 2, currentY + 100);
+    ctx.fillStyle = COLORS.accentPurple;
+    ctx.fillRect(canvasWidth / 2 - 50, currentY + 118, 100, 2);
+    ctx.fillStyle = COLORS.textSecondary;
+    ctx.font = '13px monospace';
+    ctx.fillText(
+        `${state.pairs.length} pair${state.pairs.length !== 1 ? 's' : ''} · ${pinnedIndices.length} pinned factor${pinnedIndices.length !== 1 ? 's' : ''}`,
+        canvasWidth / 2, currentY + 145
+    );
+    currentY += HEADER_HEIGHT;
+
+    // Column header row
+    ctx.fillStyle = COLORS.bgHeader;
+    ctx.fillRect(tableX, currentY, tableWidth, headerRowH);
+    ctx.fillStyle = grad;
+    ctx.fillRect(tableX, currentY, tableWidth, 2);
+
+    let colX = tableX;
+    drawCellText('PAIR', FONT_HEADER, COLORS.accentCyan, colX, currentY, headerRowH, pairColW);
+    colX += pairColW;
+    ctx.fillStyle = COLORS.border;
+    ctx.fillRect(colX, currentY + 8, 1, headerRowH - 16);
+
+    pinnedIndices.forEach((qIdx, colPos) => {
+        const question = state.questions[qIdx];
+        const quoted = question.match(/"([^"]+)"/);
+        const headerText = (quoted ? quoted[1] : question).toUpperCase();
+        drawCellText(headerText, FONT_HEADER, COLORS.accentCyan, colX, currentY, headerRowH, colWidths[colPos]);
+        colX += colWidths[colPos];
+        if (colPos < pinnedIndices.length - 1) {
+            ctx.fillStyle = COLORS.border;
+            ctx.fillRect(colX, currentY + 8, 1, headerRowH - 16);
+        }
+    });
+
+    ctx.fillStyle = COLORS.border;
+    ctx.fillRect(tableX, currentY + headerRowH - 1, tableWidth, 1);
+    currentY += headerRowH;
+
+    // Data rows
+    state.pairs.forEach((pair, rowIdx) => {
+        const rowH = rowHeights[rowIdx];
+        if (rowIdx % 2 === 0) {
+            ctx.fillStyle = COLORS.bgRowAlt;
+            ctx.fillRect(tableX, currentY, tableWidth, rowH);
+        }
+        colX = tableX;
+        drawCellText(pair, FONT_PAIR, COLORS.textPrimary, colX, currentY, rowH, pairColW);
+        colX += pairColW;
+        ctx.fillStyle = COLORS.border;
+        ctx.fillRect(colX, currentY + 8, 1, rowH - 16);
+
+        pinnedIndices.forEach((qIdx, colPos) => {
+            const answer = (pinnedAnswers[qIdx] || {})[pair] || '—';
+            drawCellText(answer, FONT_CELL, colorFor(answer), colX, currentY, rowH, colWidths[colPos]);
+            colX += colWidths[colPos];
+            if (colPos < pinnedIndices.length - 1) {
+                ctx.fillStyle = COLORS.border;
+                ctx.fillRect(colX, currentY + 8, 1, rowH - 16);
+            }
+        });
+
+        ctx.fillStyle = COLORS.border;
+        ctx.fillRect(tableX, currentY + rowH - 1, tableWidth, 1);
+        currentY += rowH;
+    });
+
+    // Outer border
+    ctx.strokeStyle = COLORS.border;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(tableX, PADDING + HEADER_HEIGHT, tableWidth, tableHeight);
+
+    // Footer
+    const gradBot = ctx.createLinearGradient(tableX, 0, tableX + tableWidth, 0);
+    gradBot.addColorStop(0, COLORS.accentCyan);
+    gradBot.addColorStop(1, COLORS.accentPurple);
+    ctx.fillStyle = gradBot;
+    ctx.fillRect(tableX, currentY + 10, tableWidth, 2);
+    ctx.fillStyle = COLORS.textSecondary;
+    ctx.font = '13px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Trade with discipline. Protect your capital. Trust your process.', canvasWidth / 2, currentY + 38);
 
     return canvas;
 }
