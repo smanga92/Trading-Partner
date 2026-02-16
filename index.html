@@ -900,7 +900,8 @@
                     <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">
                         Sessions are automatically saved. You can clear all history below.
                     </p>
-                    <button class="settings-btn danger" id="clearSessionsBtn" style="width:100%;">🗑️ Clear All Session History</button>
+                    <button class="settings-btn danger" id="clearSessionsBtn" style="width:100%;margin-bottom:10px;">🗑️ Clear All Session History</button>
+                    <button class="settings-btn danger" id="clearPinnedBtn" style="width:100%;">📌 Clear All Pinned Answers</button>
                 </div>
             </div>
 
@@ -1039,7 +1040,8 @@ const STORAGE_KEYS = {
     CONFIG: 'tradingPartner_config',
     SESSIONS: 'tradingPartner_sessions',
     CUSTOM_GROUPS: 'tradingPartner_customGroups',
-    DRAFT: 'tradingPartner_draft'
+    DRAFT: 'tradingPartner_draft',
+    PINNED: 'tradingPartner_pinned'
 };
 
 // ============================================
@@ -1050,7 +1052,8 @@ const state = {
     pairs: [],
     questions: [],
     questionGroups: {},
-    customGroups: {},     // user-created answer groups
+    questionPinned: {},   // { questionIndex: true/false } — pinned questions skip daily entry
+    customGroups: {},
     currentPairIndex: 0,
     currentQuestionIndex: 0,
     answers: {},
@@ -1059,7 +1062,7 @@ const state = {
     questionCount: 0,
     currentQuestionSetup: 0,
     answerHistory: [],
-    sessions: []          // all saved sessions
+    sessions: []
 };
 
 // Get ALL available groups (builtin + custom)
@@ -1090,9 +1093,9 @@ function loadConfig() {
             state.pairs = parsed.pairs || [];
             state.questions = parsed.questions || [];
             state.questionGroups = parsed.questionGroups || {};
+            state.questionPinned = parsed.questionPinned || {};
             state.customGroups = loadCustomGroups();
             if (state.pairs.length && state.questions.length) {
-                // Check if there's an unfinished session draft
                 const draft = loadDraft();
                 state.phase = draft ? 'draft-resume' : 'welcome-back';
             }
@@ -1104,7 +1107,8 @@ function saveConfig() {
     localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify({
         pairs: state.pairs,
         questions: state.questions,
-        questionGroups: state.questionGroups
+        questionGroups: state.questionGroups,
+        questionPinned: state.questionPinned
     }));
 }
 
@@ -1157,6 +1161,25 @@ function loadDraft() {
 
 function clearDraft() {
     localStorage.removeItem(STORAGE_KEYS.DRAFT);
+}
+
+// ============================================
+// PINNED ANSWERS PERSISTENCE
+// pinnedAnswers structure: { questionIndex: { pairName: answerText } }
+// ============================================
+function loadPinnedAnswers() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.PINNED);
+        return saved ? JSON.parse(saved) : {};
+    } catch(e) { return {}; }
+}
+
+function savePinnedAnswers(pinned) {
+    localStorage.setItem(STORAGE_KEYS.PINNED, JSON.stringify(pinned));
+}
+
+function clearPinnedAnswers() {
+    localStorage.removeItem(STORAGE_KEYS.PINNED);
 }
 
 // ============================================
@@ -1295,13 +1318,29 @@ function showWelcome() {
             ]
         );
     } else if (state.phase === 'welcome-back') {
+        const pinnedCount = Object.values(state.questionPinned).filter(Boolean).length;
+        const hasPinned = pinnedCount > 0;
+        const pinnedAnswers = loadPinnedAnswers();
+        const pinnedSet = hasPinned && Object.keys(pinnedAnswers).length > 0;
+
+        const buttons = [
+            { text: '▶ Start Session', class: 'btn-primary', action: startSession }
+        ];
+        if (hasPinned) {
+            buttons.push({ text: `📌 Update Pinned (${pinnedCount})`, class: 'btn-verdict', action: startPinnedUpdate });
+        }
+        buttons.push({ text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup });
+
+        const pinnedNote = hasPinned && !pinnedSet
+            ? `\n\n⚠️ You have ${pinnedCount} pinned question${pinnedCount > 1 ? 's' : ''} with no answers yet — set them before your first session!`
+            : hasPinned
+            ? `\n\n📌 ${pinnedCount} question${pinnedCount > 1 ? 's' : ''} pinned (carried from last update)`
+            : '';
+
         addMessage(
-            `Welcome back! 💙\n\nPairs: ${state.pairs.join(', ')}\n\nReady to start your session?`,
+            `Welcome back! 💙\n\nPairs: ${state.pairs.join(', ')}${pinnedNote}\n\nReady to start your session?`,
             true,
-            [
-                { text: '▶ Start Session', class: 'btn-primary', action: startSession },
-                { text: '⚙️ Reconfigure', class: 'btn-verdict', action: startSetup }
-            ]
+            buttons
         );
     } else {
         chatContainer.innerHTML = `
@@ -1446,6 +1485,98 @@ function finishSetup() {
 }
 
 // ============================================
+// PINNED ANSWERS UPDATE FLOW
+// ============================================
+function startPinnedUpdate() {
+    state.phase = 'pinned-update';
+    state.currentPairIndex = 0;
+    state.currentQuestionIndex = 0;
+    // Find first pinned question index
+    const firstPinned = state.questions.findIndex((_, i) => state.questionPinned[i]);
+    if (firstPinned === -1) { addMessage('No pinned questions found.', true); return; }
+
+    clearChat();
+    addMessage(
+        `📌 Update Pinned Answers\n\nYou'll go through each pinned question for each pair.\nAnswers will be saved and used in all future sessions until you update them again.`,
+        true
+    );
+    backBtn.classList.add('show');
+    forceScrollToAnchor();
+    setTimeout(() => askNextPinnedQuestion(), 600);
+}
+
+function askNextPinnedQuestion() {
+    // Find next pinned question starting from current position
+    let qIdx = state.currentQuestionIndex;
+    while (qIdx < state.questions.length && !state.questionPinned[qIdx]) qIdx++;
+
+    if (qIdx >= state.questions.length) {
+        // Done with all pinned questions for this pair
+        state.currentPairIndex++;
+        state.currentQuestionIndex = 0;
+        if (state.currentPairIndex >= state.pairs.length) {
+            finishPinnedUpdate();
+            return;
+        }
+        const prevPair = state.pairs[state.currentPairIndex - 1];
+        addMessage(`✓ ${prevPair} done\n\n→ Moving to ${state.pairs[state.currentPairIndex]}`, true);
+        setTimeout(askNextPinnedQuestion, 500);
+        return;
+    }
+
+    state.currentQuestionIndex = qIdx;
+    const pair = state.pairs[state.currentPairIndex];
+    const question = state.questions[qIdx];
+    const groupKey = state.questionGroups[qIdx];
+    const allGroups = getAllGroups();
+    const answerGroup = allGroups[groupKey];
+
+    // Show current saved answer as hint
+    const pinnedAnswers = loadPinnedAnswers();
+    const currentAnswer = (pinnedAnswers[qIdx] || {})[pair] || null;
+    const hint = currentAnswer ? `\nCurrent: ${currentAnswer}` : '';
+
+    const buttons = answerGroup.answers.map(answer => ({
+        text: answer.text,
+        class: `btn-verdict ${answer.class}`,
+        action: () => handlePinnedAnswer(answer.text, qIdx)
+    }));
+
+    addMessage(`📌 ${pair}\n\n${question}:${hint}`, true, buttons);
+    hideInput();
+}
+
+function handlePinnedAnswer(answer, qIdx) {
+    const pair = state.pairs[state.currentPairIndex];
+    const pinnedAnswers = loadPinnedAnswers();
+    if (!pinnedAnswers[qIdx]) pinnedAnswers[qIdx] = {};
+    pinnedAnswers[qIdx][pair] = answer;
+    savePinnedAnswers(pinnedAnswers);
+
+    addMessage(answer, false);
+    const messages = chatContainer.querySelectorAll('.message');
+    if (messages.length >= 2) {
+        const bg = messages[messages.length - 2].querySelector('.button-group');
+        if (bg) bg.style.display = 'none';
+    }
+
+    state.currentQuestionIndex = qIdx + 1;
+    setTimeout(askNextPinnedQuestion, 300);
+}
+
+function finishPinnedUpdate() {
+    backBtn.classList.remove('show');
+    state.phase = 'welcome-back';
+    addMessage('✅ Pinned answers updated! They will be carried into every session automatically.', true);
+    setTimeout(() => {
+        addMessage('Ready to start your session?', true, [
+            { text: '▶ Start Session', class: 'btn-primary', action: startSession },
+            { text: '← Back to Home', class: 'btn-verdict', action: showWelcome }
+        ]);
+    }, 400);
+}
+
+// ============================================
 // SESSION FLOW
 // ============================================
 function resumeDraft() {
@@ -1490,11 +1621,32 @@ function startSession() {
 function askNextQuestion() {
     if (state.currentPairIndex >= state.pairs.length) { generateSnapshot(); return; }
     const pair = state.pairs[state.currentPairIndex];
-    const question = state.questions[state.currentQuestionIndex];
-    const groupKey = state.questionGroups[state.currentQuestionIndex];
+    const qIdx = state.currentQuestionIndex;
+
+    if (!state.answers[pair]) state.answers[pair] = [];
+
+    // Check if this question is pinned — if so, auto-fill and skip
+    if (state.questionPinned[qIdx]) {
+        const pinnedAnswers = loadPinnedAnswers();
+        const pinnedAnswer = (pinnedAnswers[qIdx] || {})[pair] || '—';
+        state.answers[pair].push(pinnedAnswer);
+        // Also save to history so back button works
+        state.answerHistory.push({ pairIndex: state.currentPairIndex, questionIndex: qIdx, answer: pinnedAnswer, wasPinned: true });
+        state.currentQuestionIndex++;
+        if (state.currentQuestionIndex >= state.questions.length) {
+            state.currentPairIndex++;
+            state.currentQuestionIndex = 0;
+        }
+        saveDraft();
+        askNextQuestion(); // immediately proceed — no UI shown for pinned
+        return;
+    }
+
+    const question = state.questions[qIdx];
+    const groupKey = state.questionGroups[qIdx];
     const allGroups = getAllGroups();
     const answerGroup = allGroups[groupKey];
-    if (!state.answers[pair]) state.answers[pair] = [];
+
     const buttons = answerGroup.answers.map(answer => ({
         text: answer.text,
         class: `btn-verdict ${answer.class}`,
@@ -1688,21 +1840,17 @@ function createSnapshotCanvas() {
     }
     pairColW = Math.max(pairColW, MIN_PAIR_W);
 
-    const colWidths = state.questions.map((question) => {
+    const colWidths = state.questions.map((question, qIdx) => {
         const quoted = question.match(/"([^"]+)"/);
         const headerText = (quoted ? quoted[1] : question).toUpperCase();
         sCtx.font = FONT_HEADER;
-        // Column wide enough for the header to fit on one line
         const w = sCtx.measureText(headerText).width + CELL_PAD_H * 2;
         return Math.max(w, MIN_COL_W);
     });
 
     // ── PHASE 2: DETERMINE PER-ROW HEIGHTS ────────────────────────────────
-    // Each row's height = tallest cell in that row (pair name or any answer).
-    // The column header row height is determined by the tallest header.
-
-    // Header row height — headers fit in one line by design, but check just in case
-    let headerRowH = CELL_PAD_V * 2 + TEXT_HEIGHT; // default: 1-line height
+    // Header row height
+    let headerRowH = CELL_PAD_V * 2 + TEXT_HEIGHT;
     state.questions.forEach((question, i) => {
         const quoted = question.match(/"([^"]+)"/);
         const headerText = (quoted ? quoted[1] : question).toUpperCase();
@@ -1710,14 +1858,14 @@ function createSnapshotCanvas() {
         headerRowH = Math.max(headerRowH, h);
     });
 
-    // Data row heights
+    // Data row heights — account for 📌 prefix on pinned cells
     const rowHeights = state.pairs.map((pair) => {
-        // Height needed for the pair name cell
         let maxH = cellHeight(sCtx, FONT_PAIR, pair, pairColW);
-        // Height needed for each answer cell
         state.questions.forEach((_, qIdx) => {
-            const answer = (state.answers[pair] || [])[qIdx] || '';
-            const h = cellHeight(sCtx, FONT_CELL, answer, colWidths[qIdx]);
+            const rawAnswer = (state.answers[pair] || [])[qIdx] || '';
+            const isPinned = !!state.questionPinned[qIdx];
+            const displayAnswer = isPinned ? `📌 ${rawAnswer}` : rawAnswer;
+            const h = cellHeight(sCtx, FONT_CELL, displayAnswer, colWidths[qIdx]);
             maxH = Math.max(maxH, h);
         });
         return maxH;
@@ -1840,7 +1988,9 @@ function createSnapshotCanvas() {
 
         // Answer cells
         (state.answers[pair] || []).forEach((answer, ansIdx) => {
-            drawCellText(answer, FONT_CELL, colorFor(answer), colX, currentY, rowH, colWidths[ansIdx]);
+            const isPinned = !!state.questionPinned[ansIdx];
+            const displayAnswer = isPinned ? `📌 ${answer}` : answer;
+            drawCellText(displayAnswer, FONT_CELL, colorFor(answer), colX, currentY, rowH, colWidths[ansIdx]);
             colX += colWidths[ansIdx];
             if (ansIdx < state.questions.length - 1) {
                 ctx.fillStyle = COLORS.border;
@@ -1986,12 +2136,13 @@ document.getElementById('settingsBtn').addEventListener('click', openSettings);
 document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
 document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
 
-let tempPairs = [], tempQuestions = [], tempQuestionGroups = {}, tempCustomGroups = {};
+let tempPairs = [], tempQuestions = [], tempQuestionGroups = {}, tempQuestionPinned = {}, tempCustomGroups = {};
 
 function openSettings() {
     tempPairs = [...state.pairs];
     tempQuestions = [...state.questions];
     tempQuestionGroups = {...state.questionGroups};
+    tempQuestionPinned = {...state.questionPinned};
     tempCustomGroups = JSON.parse(JSON.stringify(loadCustomGroups()));
     renderSettings();
     settingsOverlay.classList.add('show');
@@ -2007,6 +2158,7 @@ function saveSettings() {
     state.pairs = tempPairs;
     state.questions = tempQuestions;
     state.questionGroups = tempQuestionGroups;
+    state.questionPinned = tempQuestionPinned;
     saveCustomGroups(tempCustomGroups);
     state.customGroups = tempCustomGroups;
     saveConfig();
@@ -2056,14 +2208,18 @@ function renderQuestions() {
     tempQuestions.forEach((q, i) => {
         const gk = tempQuestionGroups[i];
         const gn = allGroups[gk] ? allGroups[gk].name : 'Not set';
+        const isPinned = !!tempQuestionPinned[i];
         const item = document.createElement('div');
         item.className = 'config-item';
         item.innerHTML = `
             <div class="config-item-content">
-                <div class="config-item-text">${i+1}. ${q}</div>
-                <div class="config-item-meta">Answer Group: ${gn}</div>
+                <div class="config-item-text">${i+1}. ${q} ${isPinned ? '<span style="color:var(--warning);font-size:12px">📌 Pinned</span>' : ''}</div>
+                <div class="config-item-meta">Answer Group: ${gn} · ${isPinned ? 'Skipped in daily session — answer set once' : 'Asked every session'}</div>
             </div>
             <div class="config-item-actions">
+                <button class="icon-btn" title="${isPinned ? 'Unpin — ask every session' : 'Pin — set once, reuse daily'}"
+                    onclick="togglePinQuestion(${i})"
+                    style="font-size:14px;${isPinned ? 'border-color:var(--warning);color:var(--warning)' : ''}">📌</button>
                 <button class="icon-btn" ${i===0?'disabled style="opacity:.3"':''} onclick="moveQuestionUp(${i})">↑</button>
                 <button class="icon-btn" ${i===tempQuestions.length-1?'disabled style="opacity:.3"':''} onclick="moveQuestionDown(${i})">↓</button>
                 <button class="icon-btn edit" onclick="editQuestion(${i})">✏️</button>
@@ -2123,19 +2279,41 @@ window.movePairDown = i => { if(i<tempPairs.length-1){const t=tempPairs[i];tempP
 window.editPair = i => showEditForm('pair', i, tempPairs[i]);
 window.deletePair = i => { if(confirm(`Delete "${tempPairs[i]}"?`)){tempPairs.splice(i,1);renderPairs();} };
 
+// Pin toggle
+window.togglePinQuestion = function(i) {
+    tempQuestionPinned[i] = !tempQuestionPinned[i];
+    renderQuestions();
+};
+
 // Question actions
 window.moveQuestionUp = i => {
-    if(i>0){const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i-1];tempQuestions[i-1]=t;const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i-1];tempQuestionGroups[i-1]=tg;renderQuestions();}
+    if(i>0){
+        const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i-1];tempQuestions[i-1]=t;
+        const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i-1];tempQuestionGroups[i-1]=tg;
+        const tp=tempQuestionPinned[i];tempQuestionPinned[i]=tempQuestionPinned[i-1];tempQuestionPinned[i-1]=tp;
+        renderQuestions();
+    }
 };
 window.moveQuestionDown = i => {
-    if(i<tempQuestions.length-1){const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i+1];tempQuestions[i+1]=t;const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i+1];tempQuestionGroups[i+1]=tg;renderQuestions();}
+    if(i<tempQuestions.length-1){
+        const t=tempQuestions[i];tempQuestions[i]=tempQuestions[i+1];tempQuestions[i+1]=t;
+        const tg=tempQuestionGroups[i];tempQuestionGroups[i]=tempQuestionGroups[i+1];tempQuestionGroups[i+1]=tg;
+        const tp=tempQuestionPinned[i];tempQuestionPinned[i]=tempQuestionPinned[i+1];tempQuestionPinned[i+1]=tp;
+        renderQuestions();
+    }
 };
 window.editQuestion = i => showEditForm('question', i, tempQuestions[i], tempQuestionGroups[i]);
 window.deleteQuestion = i => {
     if(confirm(`Delete question "${tempQuestions[i]}"?`)){
         tempQuestions.splice(i,1);
-        const ng={};Object.keys(tempQuestionGroups).forEach(k=>{const idx=parseInt(k);if(idx<i)ng[idx]=tempQuestionGroups[idx];else if(idx>i)ng[idx-1]=tempQuestionGroups[idx];});
-        tempQuestionGroups=ng;renderQuestions();
+        const ng={}, ngg={}, ngp={};
+        Object.keys(tempQuestionGroups).forEach(k=>{
+            const idx=parseInt(k);
+            if(idx<i){ ng[idx]=tempQuestionGroups[idx]; ngg[idx]=tempQuestionGroups[idx]; ngp[idx]=tempQuestionPinned[idx]; }
+            else if(idx>i){ ng[idx-1]=tempQuestionGroups[idx]; ngp[idx-1]=tempQuestionPinned[idx]; }
+        });
+        tempQuestionGroups=ng; tempQuestionPinned=ngp;
+        renderQuestions();
     }
 };
 
@@ -2278,10 +2456,14 @@ window.saveQuestionEdit = function(index) {
 // ============================================
 document.getElementById('exportBtn').addEventListener('click', () => {
     const config = {
-        version: '2.0',
+        version: '3.0',
         timestamp: new Date().toISOString(),
         pairs: tempPairs,
-        questions: tempQuestions.map((q, i) => ({ text: q, group: tempQuestionGroups[i] })),
+        questions: tempQuestions.map((q, i) => ({
+            text: q,
+            group: tempQuestionGroups[i],
+            pinned: !!tempQuestionPinned[i]
+        })),
         customGroups: tempCustomGroups
     };
     const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
@@ -2305,8 +2487,12 @@ document.getElementById('importFileInput').addEventListener('change', e => {
             if (!config.pairs || !Array.isArray(config.pairs)) throw new Error('pairs missing');
             if (!config.questions || !Array.isArray(config.questions)) throw new Error('questions missing');
             tempPairs = config.pairs;
-            tempQuestions = []; tempQuestionGroups = {};
-            config.questions.forEach((q, i) => { tempQuestions.push(q.text); tempQuestionGroups[i] = q.group || 'bias'; });
+            tempQuestions = []; tempQuestionGroups = {}; tempQuestionPinned = {};
+            config.questions.forEach((q, i) => {
+                tempQuestions.push(q.text);
+                tempQuestionGroups[i] = q.group || 'bias';
+                if (q.pinned) tempQuestionPinned[i] = true;
+            });
             if (config.customGroups) tempCustomGroups = config.customGroups;
             renderSettings();
             addMessage('📥 Configuration imported!', true);
@@ -2320,6 +2506,13 @@ document.getElementById('clearSessionsBtn').addEventListener('click', () => {
     if (confirm('Clear ALL session history? This cannot be undone.')) {
         clearAllSessions();
         addMessage('🗑️ Session history cleared.', true);
+    }
+});
+
+document.getElementById('clearPinnedBtn').addEventListener('click', () => {
+    if (confirm('Clear all pinned answers? You will need to set them again before your next session.')) {
+        clearPinnedAnswers();
+        addMessage('📌 Pinned answers cleared.', true);
     }
 });
 
